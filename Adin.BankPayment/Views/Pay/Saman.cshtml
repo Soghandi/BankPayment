@@ -1,0 +1,44 @@
+﻿@model Adin.BankPayment.Domain.Model.Transaction
+@{
+    Layout = null;
+}
+<form action="@Model.Bank.PostUrl" method="POST" id="frmSendToBank">
+    <input type="hidden" name="Amount" value="@Convert.ToInt64(Model.Amount)" />
+    <input type="hidden" name="ResNum" value="@Model.UserTrackCode" />
+    <!--<input type="hidden" name="Amount" value="1000" />
+    <input type="hidden" name="ResNum" value="123456" />-->
+    <input type="hidden" name="RedirectURL" value="@Model.BankRedirectUrl" />
+    @foreach (var item in (List<Adin.BankPayment.Domain.Model.ApplicationBankParam>)ViewBag.Params)
+    {
+        <input type="hidden" name="@item.ParamKey" value="@item.ParamValue" />
+    }
+    <input type="hidden" name="CellNumber" value="@Model.Mobile" />
+
+</form>
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<div class="alert alert-success movetopage">
+    در حال انتقال به درگاه پرداخت بانک...
+</div>
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+
+<script type="text/javascript">
+    document.getElementById("frmSendToBank").submit();
+</script>
