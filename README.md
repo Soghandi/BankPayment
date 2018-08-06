@@ -105,7 +105,7 @@ callback:
     {
         try
         {
-            //Todo: Please deliver product to customer here
+            //Todo: deliver product to customer here
 
 
             var res = await client.Verify(payId);
