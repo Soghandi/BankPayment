@@ -26,22 +26,28 @@ Easily connect to Iranian bank gateways without getting involved with their cont
 1- clone project, build and run Adin.BankPayment in your server (Windows, Linux, Mac)
   <br/>
   build command:
-  <br/>
+<br/>
+
 ```
 dotnet build Adin.BankPayment
 ```
+
  <br/>
  publish command:
  <br/>
-```
+ 
+ ```
 dotnet publish .\Adin.BankPayment\Adin.BankPayment.csproj
 ```
+
 <br/>
 run command:
 <br/>
+
 ```
 dotnet .\Adin.BankPayment\bin\Debug\netcoreapp2.1\publish\Adin.BankPayment.dll
-``` 
+```
+
 <br/>
 server is ready!
 <br/>
