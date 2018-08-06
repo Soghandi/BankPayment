@@ -34,7 +34,45 @@ namespace Adin.BankPayment.Controllers
             _applicationBankParamRepository = applicationBankParamRepository;
         }
 
-        [HttpGet]
+
+        [HttpPost]
+        public async Task<IActionResult> AddApplication(string title, string publickey, string description)
+        {
+            try
+            {
+                Application app = await _applicationRepository.GetFirstBy(x => x.Title == title);
+                if (app != null)
+                {
+                    return BadRequest("اپلیکیشنی با همین نام از قبل وجود دارد");
+                }
+
+                if (publickey == null || publickey .Length<16)
+                {
+                    return BadRequest("طول کلید باید بیشتر از 16 کاراکتر باشد");
+                }
+                Application application = new Application
+                {
+                    IsDeleted = false,
+                    Status = (byte)Domain.Enum.ApplicationEnum.Normal,
+                    Title = title,
+                    CreatedBy = 1,
+                    CreationDate = DateTime.Now,
+                    PublicKey = publickey,
+                    PrivateKey = null,
+                    Description = description,
+                };
+                await _applicationRepository.Add(application);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest();
+            }
+        }
+
+
+        [HttpPost]
         public async Task<IActionResult> SetSamanParams(string publicKey, string MID)
         {
             try
@@ -83,7 +121,7 @@ namespace Adin.BankPayment.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         public async Task<IActionResult> SetParsianParams(string publicKey, string Pin)
         {
             try
@@ -93,7 +131,7 @@ namespace Adin.BankPayment.Controllers
                 {
                     return Unauthorized();
                 }
-                var bank = await _bankRepository.GetFirstBy(x => x.Code == (byte) Connector.Enum.BankCodeEnum.Parsian);
+                var bank = await _bankRepository.GetFirstBy(x => x.Code == (byte)Connector.Enum.BankCodeEnum.Parsian);
                 var applicationBank = await _applicationBankRepository.GetFirstBy(x => x.ApplicationId == application.Id && x.BankId == bank.Id);
 
                 if (applicationBank == null)
@@ -132,8 +170,8 @@ namespace Adin.BankPayment.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> SetMellatParams(string publicKey, string terminalId,string userName,string password)
+        [HttpPost]
+        public async Task<IActionResult> SetMellatParams(string publicKey, string terminalId, string userName, string password)
         {
             try
             {
