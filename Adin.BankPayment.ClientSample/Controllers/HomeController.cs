@@ -59,7 +59,7 @@ namespace Adin.BankPayment.ClientSample.Controllers
     {
         try
         {
-            //Todo: Please Deliver product to customer Here
+            //Todo: Please deliver product to customer here
 
 
             var res = await client.Verify(payId);
