@@ -45,41 +45,41 @@ namespace Adin.BankPayment.ClientSample.Controllers
 
         public async Task<IActionResult> CallBack()
         {
-            Guid payId = Guid.Parse(Request.Query["id"]);
-            string trackCode = Request.Query["trackCode"];
-            bool status = bool.Parse(Request.Query["status"]);
-            string message = Request.Query["message"];
-            if (status == false)
+    Guid payId = Guid.Parse(Request.Query["id"]);
+    string trackCode = Request.Query["trackCode"];
+    bool status = bool.Parse(Request.Query["status"]);
+    string message = Request.Query["message"];
+    if (status == false)
+    {
+        int errorCode = int.Parse(Request.Query["errorCode"]);
+        BankErrorCodeEnum errCode = (BankErrorCodeEnum)errorCode;
+        ViewBag.Result = message;
+    }
+    else
+    {
+        try
+        {
+            //Todo: Please Deliver product to customer Here
+
+
+            var res = await client.Verify(payId);
+            if (res.Status == Connector.Enum.ApiStatusCodeEnum.Success && res.Body.Status)
             {
-                int errorCode = int.Parse(Request.Query["errorCode"]);
-                BankErrorCodeEnum errCode = (BankErrorCodeEnum)errorCode;
-                ViewBag.Result = message;
+                //Transaction Done
+                ViewBag.Result = res.Body.Message;
             }
             else
             {
-                try
-                {
-                    //Todo: Please Deliver User Customer Here
-
-
-                    var res = await client.Verify(payId);
-                    if (res.Status == Connector.Enum.ApiStatusCodeEnum.Success && res.Body.Status)
-                    {
-                        //Transaction Done
-                        ViewBag.Result = res.Body.Message;
-                    }
-                    else
-                    {
-                        //Transaction Failed
-                        ViewBag.Result = res.Body.Message + "<br/>" + "تا 24 ساعت دیگر مبلغ به حساب شما بازگردانده خواهد شد";
-                    }
-                }
-                catch
-                {
-                    //Reverse Transaction
-                }
+                //Transaction Failed
+                ViewBag.Result = res.Body.Message + "<br/>" + "تا 24 ساعت دیگر مبلغ به حساب شما بازگردانده خواهد شد";
             }
-            return View();
+        }
+        catch
+        {
+            //Reverse Transaction
+        }
+    }
+    return View();
         }
 
        
