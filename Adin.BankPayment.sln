@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Adin.BankPayment.Connector"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Adin.BankPayment.Parsian", "Adin.BankPayment.Parsian\Adin.BankPayment.Parsian.csproj", "{E335D137-7B0B-43C6-8708-4FE255212E11}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Adin.BankPayment.Mellat", "Adin.BankPayment.Mellat\Adin.BankPayment.Mellat.csproj", "{7DF55168-DC6A-4907-848C-6EF767BCBA8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Adin.BankPayment.Mellat", "Adin.BankPayment.Mellat\Adin.BankPayment.Mellat.csproj", "{7DF55168-DC6A-4907-848C-6EF767BCBA8B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

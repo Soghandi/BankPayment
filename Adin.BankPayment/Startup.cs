@@ -26,7 +26,9 @@ namespace Adin.BankPayment
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            
+
+            string connection = Configuration["ConnectionString"];
+            services.AddDbContext<BankPaymentContext>(options => options.UseSqlServer(connection));
 
             try
             {
@@ -57,7 +59,6 @@ namespace Adin.BankPayment
             }
 
 
-            string connection = Configuration["ConnectionString"];
             services.AddDbContext<BankPaymentContext>(options => options.UseSqlServer(connection));
             services.AddTransient<IRepository<Transaction>, TransactionRepository>();
             services.AddTransient<IRepository<Application>, ApplicationRepository>();
