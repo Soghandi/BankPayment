@@ -20,16 +20,34 @@ Easily connect to Iranian bank gateways without getting involved with their cont
   </ul>
 <br/>
 <b>
-  How to use:  
+  How to setup server:  
  </b>
  <br/>
-1- clone project, build and run Adin.BankPayment in your server (Windows, Linux, Mac)
+clone project, build and run Adin.BankPayment in your server (Windows, Linux, Mac)
   <br/>
   build command:
 <br/>
 
 ```
 dotnet build Adin.BankPayment
+```
+
+<br/>
+ add connectionstring to appsettings in Adin.Bankpayment project 
+ <br/>
+ 
+```
+{
+"ConnectionString": "Server=SERVERNAME;Database=DATABASENAME;User Id=DATABASEUSER;Password=PASSWORD;MultipleActiveResultSets=True"
+}
+```
+
+ <br/>
+ run below command to create tables with default values:
+ <br/>
+ 
+```
+dotnet ef database update -p .\Adin.BankPayment.Domain\Adin.BankPayment.Domain.csproj -s .\Adin.BankPayment\Adin.BankPayment.csproj
 ```
 
  <br/>
@@ -49,16 +67,25 @@ dotnet .\Adin.BankPayment\bin\Debug\netcoreapp2.1\publish\Adin.BankPayment.dll
 ```
 
 <br/>
-server is ready!
+after project started successfully you can easily add various applications with multiple bank gateways from swagger url:
+http://localhost:5000/api-docs/index.html
 <br/>
- 
-2- add connector dll to client project
+server configuration finish!
+<br/>
+<br/>
+ <br/>
+<b>
+  How to setup client:  
+ </b>
+ <br/>
+
+First add connector dll to client project
  <br/>
 ```
 Install-Package Adin.BankPayment.Connector
 ```
  <br/>
-3- use it in your project (like sample project)
+use it in your project (like sample project)
 
 send request:
 
