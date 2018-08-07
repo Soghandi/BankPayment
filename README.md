@@ -98,7 +98,7 @@ send request:
        Amount = 1000,
        BankCode = BankCodeEnum.Saman,
        CallbackUrl = currentBaseUrl + "/Home/Callback",
-       Mobile = 989129475195,
+       Mobile = 989354762696,
        PriceUnit = Connector.Enum.PriceUnitEnum.Rial,
        TrackCode = DateTime.Now.ToString("hhmmssfff")
    };
