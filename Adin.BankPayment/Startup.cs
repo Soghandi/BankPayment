@@ -35,11 +35,6 @@ namespace Adin.BankPayment
                 // Register the Swagger generator, defining one or more Swagger documents
                 services.AddSwaggerGen(options =>
                 {
-#if DEBUG
-                    //options.IncludeXmlComments(@"SarayarApi.xml");
-#else
-                    // options.IncludeXmlComments(@"SarayarApi.xml");
-#endif
 
                     options.SwaggerDoc("v1", new Swashbuckle.AspNetCore.Swagger.Info
                     {
