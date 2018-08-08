@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Simple authentication token provider for ASP.NET Core.</Description>
+    <Authors>Mostafa Soghandi</Authors>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Adin.BankPayment.TokenProvider</AssemblyName>
+    <PackageId>Adin.BankPayment.TokenProvider</PackageId>
+    <PackageTags>token;authentication;security;jwt</PackageTags>
+    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
+    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="1.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="1.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="1.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="1.0.2" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.0.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.0.0" />
+  </ItemGroup>
+
+</Project>
