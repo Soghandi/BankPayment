@@ -44,9 +44,9 @@ namespace Adin.BankPayment.Service
 
         public async Task Delete(Guid id)
         {
-            //Bank obj = await Get(id);
-            //obj.IsDeleted = true;
-            //await Update(obj);
+            var obj = await Get(id);
+            obj.IsDeleted = true;
+            await Update(obj);
         }
 
         public async Task DeletePermanently(Guid id)

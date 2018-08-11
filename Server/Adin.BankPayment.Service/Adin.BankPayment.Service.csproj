@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="rgtemr3y.km4~" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Adin.BankPayment.Domain\Adin.BankPayment.Domain.csproj" />
   </ItemGroup>
 

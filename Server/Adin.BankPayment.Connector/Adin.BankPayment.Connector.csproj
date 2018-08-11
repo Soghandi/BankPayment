@@ -5,9 +5,13 @@
     <Authors>Mostafa Soghandi</Authors>
     <Company>Adin</Company>
     <Product>BankPaymentConnector</Product>
-    <AssemblyVersion>1.0.3.0</AssemblyVersion>
-    <FileVersion>1.0.3.0</FileVersion>
-    <Version>1.0.3</Version>
+    <AssemblyVersion>1.0.4.0</AssemblyVersion>
+    <FileVersion>1.0.4.0</FileVersion>
+    <Version>1.0.4</Version>
+    <PackageTags>Bank,Payment,Saman,Parsian,Behpardakht,Mellat,Iranian</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>Connect to Iranian bank gateways easily
+Include: Saman , Parsian , Behpardakht (Mellat) , ....</Description>
   </PropertyGroup>
 
   <ItemGroup>

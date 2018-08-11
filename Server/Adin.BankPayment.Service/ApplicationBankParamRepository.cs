@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Z.EntityFramework.Plus;
 
 namespace Adin.BankPayment.Service
 {
@@ -48,9 +49,9 @@ namespace Adin.BankPayment.Service
 
         public async Task Delete(Guid id)
         {
-            ApplicationBankParam ApplicationBankParam = await Get(id);
-            entity.Remove(ApplicationBankParam);
-            await context.SaveChangesAsync();
+            var obj = await Get(id);
+            obj.IsDeleted = true;
+            await Update(obj);
         }
         public async Task<IEnumerable<ApplicationBankParam>> GetAllBy(Expression<Func<ApplicationBankParam, bool>> predicate)
         {
@@ -61,9 +62,9 @@ namespace Adin.BankPayment.Service
             return await entity.Where(predicate).FirstOrDefaultAsync();
         }
 
-        public Task DeletePermanently(Guid id)
+        public async Task DeletePermanently(Guid id)
         {
-            throw new NotImplementedException();
+            await entity.Where(x => x.Id == id).DeleteAsync();                     
         }
     }
 }
