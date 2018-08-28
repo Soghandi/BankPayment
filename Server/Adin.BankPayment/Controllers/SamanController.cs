@@ -1,14 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using System.Security.Cryptography.X509Certificates;
-using System.Net.Security;
-using Microsoft.Extensions.Logging;
-using Adin.BankPayment.Service;
+﻿using Adin.BankPayment.Connector.Enum;
 using Adin.BankPayment.Domain.Model;
-using Adin.BankPayment.Connector.Enum;
+using Adin.BankPayment.Service;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace Adin.BankPayment.Controllers
@@ -20,14 +16,13 @@ namespace Adin.BankPayment.Controllers
         private string _transactionState = string.Empty;
         private string _traceNumber = string.Empty;
         private bool _isError = false;
-        private string _errorMsg = "";      
-        private string _webBaseUrl = "";        
+        private string _errorMsg = "";
+        private string _webBaseUrl = "";
         private readonly ILogger<SamanController> _logger;
         private IRepository<Transaction> _transactionRepository;
-        private IRepository<Application> _applicationRepository;
-        private IRepository<Bank> _bankRepository;
-        private IRepository<ApplicationBank> _applicationBankRepository;
-
+        private readonly IRepository<Application> _applicationRepository;
+        private readonly IRepository<Bank> _bankRepository;
+        private readonly IRepository<ApplicationBank> _applicationBankRepository;
 
         public SamanController(ILogger<SamanController> logger,
                                IRepository<Transaction> transactionRepository,
@@ -40,9 +35,7 @@ namespace Adin.BankPayment.Controllers
             _applicationRepository = applicationRepository;
             _bankRepository = bankRepository;
             _applicationBankRepository = applicationBankRepository;
-
         }
-
 
         [HttpPost]
         public async Task<IActionResult> Callback(string token, string secondTrackCode)
@@ -52,14 +45,15 @@ namespace Adin.BankPayment.Controllers
             _logger.LogDebug("token:" + token);
             _logger.LogDebug("secondTrackCode:" + secondTrackCode);
             Transaction transaction = await _transactionRepository.Get(Guid.Parse(secondTrackCode));
-            if (transaction.Status != (byte)TransactionStatusEnum.Initial)
+
+            if (transaction.Status == (byte)TransactionStatusEnum.Success)
             {
                 return BadRequest();
             }
 
             string longurl = transaction.CallbackUrl;
             var uriBuilder = new UriBuilder(longurl);
-            var query = HttpUtility.ParseQueryString(uriBuilder.Query);       
+            var query = HttpUtility.ParseQueryString(uriBuilder.Query);
             string message = "";
             var refNum = Request.Form["RefNum"];
 
@@ -70,8 +64,6 @@ namespace Adin.BankPayment.Controllers
                 {
                     if (_transactionState.Equals("OK"))
                     {
-
-
                         bankErrorCode = BankErrorCodeEnum.NoError;
                         transaction.BankErrorCode = (byte)bankErrorCode;
                         transaction.Status = (byte)TransactionStatusEnum.BankOk;
@@ -79,7 +71,6 @@ namespace Adin.BankPayment.Controllers
                         transaction.ModifiedBy = 1;
                         transaction.BankTrackCode = refNum;
                         await _transactionRepository.Update(transaction);
-
 
                         query["id"] = transaction.Id.ToString();
                         query["trackCode"] = transaction.UserTrackCode.ToString();
@@ -89,7 +80,7 @@ namespace Adin.BankPayment.Controllers
                         uriBuilder.Query = query.ToString();
                         longurl = uriBuilder.ToString();
                         var url3 = string.Format(longurl);
-                        return Redirect(url3);                   
+                        return Redirect(url3);
                     }
                     else
                     {
@@ -195,14 +186,14 @@ namespace Adin.BankPayment.Controllers
                         }
                     }
                 }
-
             }
             catch (Exception ex)
             {
                 _errorMsg = ex.Message;
                 _logger.LogError(ex.Message);
             }
-            _logger.LogError(_errorMsg);         
+
+            _logger.LogError(_errorMsg);
             var mid1 = Request.Form["MID"];
 
             transaction.Status = (byte)TransactionStatusEnum.Failed;
@@ -211,8 +202,6 @@ namespace Adin.BankPayment.Controllers
             transaction.ModifiedOn = DateTime.Now;
             transaction.ModifiedBy = 1;
             await _transactionRepository.Update(transaction);
-
-
 
             query["id"] = transaction.Id.ToString();
             query["trackCode"] = transaction.UserTrackCode.ToString();
@@ -243,7 +232,6 @@ namespace Adin.BankPayment.Controllers
 
         private bool RequestFeildIsEmpty()
         {
-
             _logger.LogDebug("RequestFeildIsEmpty");
             if (Request.Form["state"].ToString().Equals(string.Empty))
             {
@@ -269,7 +257,6 @@ namespace Adin.BankPayment.Controllers
                 return true;
             }
             return false;
-        }       
-      
+        }
     }
 }
