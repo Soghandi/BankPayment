@@ -168,16 +168,16 @@ namespace Adin.BankPayment
                 // Enable middleware to serve generated Swagger as a JSON endpoint.
                 app.UseSwagger(c =>
                 {
-                    c.RouteTemplate = "api-docs";
-                    c.RouteTemplate = "api-docs/{documentName}/bankpayment.json";
+                    c.RouteTemplate = "api-help";
+                    c.RouteTemplate = "api-help/{documentName}/bankpayment.json";
                 });
 
 
                 // Enable middleware to serve swagger-ui (HTML, JS, CSS etc.), specifying the Swagger JSON endpoint.
                 app.UseSwaggerUI(c =>
                 {
-                    c.RoutePrefix = "api-docs";
-                    c.SwaggerEndpoint("/api-docs/v1/bankpayment.json", "BankPayment API V1");
+                    c.RoutePrefix = "api-help";
+                    c.SwaggerEndpoint("/api-help/v1/bankpayment.json", "BankPayment API V1");
                     //c.ShowRequestHeaders();
                 });
 
