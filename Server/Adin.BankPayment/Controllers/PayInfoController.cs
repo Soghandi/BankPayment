@@ -25,7 +25,7 @@ namespace Adin.BankPayment.Controllers
 
 
 
-        public PayInfoController(IMemoryCache memCaches, 
+        public PayInfoController(IMemoryCache memCaches,
                              ILogger<PayController> logger,
                              IRepository<Transaction> transactionRepository,
                              IRepository<Application> applicationRepository,
@@ -132,7 +132,7 @@ namespace Adin.BankPayment.Controllers
         public async Task<IActionResult> Verify(Guid id)
         {
             try
-            {                
+            {
                 var application = await GetApplicationAsync();
                 if (application == null || application.Status != 0)
                 {
@@ -159,6 +159,56 @@ namespace Adin.BankPayment.Controllers
                         return Ok(result);
 
                 }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                if (ex.InnerException != null)
+                    _logger.LogError(ex.InnerException.Message);
+                throw;
+            }
+
+        }
+
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> CancelPayment(Guid id)
+        {
+            try
+            {
+                var application = await GetApplicationAsync();
+                if (application == null || application.Status != 0)
+                {
+                    return Unauthorized();
+                }
+
+                var transaction = await _transactionRepository.Get(id);
+                if (transaction == null)
+                {
+                    return Unauthorized();
+                }
+
+                if (transaction.Status == (byte)TransactionStatusEnum.BankOk || transaction.Status == (byte)TransactionStatusEnum.Success)
+                {
+                    return BadRequest(new CancelPaymentResponseModel
+                    {
+                        ErrorCode = (byte)ErrorCodeEnum.OperationAlreadyDone,
+                        Message = "پرداخت قبلا انجام شده است",
+                        Status = false
+                    });
+                }
+
+                transaction.Status = (byte)TransactionStatusEnum.Cancel;
+                transaction.ModifiedBy = 1;
+                transaction.ModifiedOn = DateTime.Now;
+                await _transactionRepository.Update(transaction);
+                return Ok(new CancelPaymentResponseModel
+                {
+                    ErrorCode = (byte)ErrorCodeEnum.NoError,
+                    Message = "پرداخت با موفقیت کنسل شذ ",
+                    Status = true
+                });
             }
             catch (Exception ex)
             {

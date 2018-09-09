@@ -72,15 +72,15 @@ namespace Adin.BankPayment.Controllers
                         {
                             case 20:
                             case 22:
-                                transaction.ErrorCode = (byte)BankErrorCodeEnum.InvalidPin;
+                                transaction.ErrorCode = (byte)ErrorCodeEnum.InvalidPin;
                                 transaction.BankErrorMessage = "پين فروشنده درست نميباشد";
                                 break;
                             case 30:
-                                transaction.ErrorCode = (byte)BankErrorCodeEnum.OperationAlreadyDone;
+                                transaction.ErrorCode = (byte)ErrorCodeEnum.OperationAlreadyDone;
                                 transaction.BankErrorMessage = "عمليات قبلا با موفقيت انجام شده است";
                                 break;
                             case 34:
-                                transaction.ErrorCode = (byte)BankErrorCodeEnum.UserTrackCodeIsInvalid;
+                                transaction.ErrorCode = (byte)ErrorCodeEnum.UserTrackCodeIsInvalid;
                                 transaction.BankErrorMessage = "شماره تراكنش فروشنده درست نميباشد";
                                 break;
                         }

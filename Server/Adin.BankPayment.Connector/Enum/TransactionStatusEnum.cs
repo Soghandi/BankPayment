@@ -9,6 +9,6 @@
         ErrorOnVerify = 4,
         ReverseTransaction = 5,
         WaitingForSettle = 6,
-        CanceledByOwner = 7
+        Cancel = 7
     }
 }

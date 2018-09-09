@@ -80,7 +80,7 @@ namespace Adin.BankPayment.Extension
                                 await _transactionRepository.Update(transaction);
 
                                 verifyTransactionResult.Status = true;
-                                verifyTransactionResult.ErrorCode = (byte)BankErrorCodeEnum.NoError;
+                                verifyTransactionResult.ErrorCode = (byte)ErrorCodeEnum.NoError;
                                 verifyTransactionResult.Message = message;
                                 _logger.LogError("Mellat Verify Done!");
                                 return verifyTransactionResult;
@@ -98,7 +98,7 @@ namespace Adin.BankPayment.Extension
                                 await _transactionRepository.Update(transaction);
 
                                 verifyTransactionResult.Status = true;
-                                verifyTransactionResult.ErrorCode = (byte)BankErrorCodeEnum.NoError;
+                                verifyTransactionResult.ErrorCode = (byte)ErrorCodeEnum.NoError;
                                 verifyTransactionResult.Message = message;
                                 _logger.LogError("Mellat Verify Done!");
                                 return verifyTransactionResult;
@@ -121,7 +121,7 @@ namespace Adin.BankPayment.Extension
                         await _transactionRepository.Update(transaction);
 
                         verifyTransactionResult.Status = false;
-                        verifyTransactionResult.ErrorCode = (byte)BankErrorCodeEnum.VerifyError;
+                        verifyTransactionResult.ErrorCode = (byte)ErrorCodeEnum.VerifyError;
                         verifyTransactionResult.Message = message;
                         _logger.LogError("Mellat Verify reverse!");
                         return verifyTransactionResult;                       
@@ -135,14 +135,14 @@ namespace Adin.BankPayment.Extension
 
                     _logger.LogError("errr1");
                     transaction.Status = (byte)TransactionStatusEnum.ErrorOnVerify;
-                    transaction.BankErrorCode = (byte)BankErrorCodeEnum.VerifyError;
+                    transaction.BankErrorCode = (byte)ErrorCodeEnum.VerifyError;
                     transaction.BankErrorMessage =message;
                     transaction.ModifiedOn = DateTime.Now;
                     transaction.ModifiedBy = 1;
                     await _transactionRepository.Update(transaction);
 
                     verifyTransactionResult.Status = false;
-                    verifyTransactionResult.ErrorCode = (byte)BankErrorCodeEnum.VerifyError;
+                    verifyTransactionResult.ErrorCode = (byte)ErrorCodeEnum.VerifyError;
                     verifyTransactionResult.Message = message;
                     _logger.LogError("Mellat Verify error1!");
                     return verifyTransactionResult;
@@ -156,14 +156,14 @@ namespace Adin.BankPayment.Extension
 
                 _logger.LogError("err2" );
                 transaction.Status = (byte)TransactionStatusEnum.ErrorOnVerify;
-                transaction.BankErrorCode = (byte)BankErrorCodeEnum.VerifyError;
+                transaction.BankErrorCode = (byte)ErrorCodeEnum.VerifyError;
                 transaction.BankErrorMessage = message;
                 transaction.ModifiedOn = DateTime.Now;
                 transaction.ModifiedBy = 1;
                 await _transactionRepository.Update(transaction);
 
                 verifyTransactionResult.Status = false;
-                verifyTransactionResult.ErrorCode = (byte)BankErrorCodeEnum.VerifyError;
+                verifyTransactionResult.ErrorCode = (byte)ErrorCodeEnum.VerifyError;
                 verifyTransactionResult.Message = message;
                 _logger.LogError("Mellat Verify error2!");
                 return verifyTransactionResult;
@@ -325,240 +325,240 @@ namespace Adin.BankPayment.Extension
         }
 
 
-        public static BankErrorCodeEnum ErrorResult(string ID)
+        public static ErrorCodeEnum ErrorResult(string ID)
         {
-            BankErrorCodeEnum bankErrorCodeEnum = BankErrorCodeEnum.UnkownError;
+            ErrorCodeEnum bankErrorCodeEnum = ErrorCodeEnum.UnkownError;
             switch (ID)
             {
                 case "-100":
 
                     //result = "پرداخت لغو شده";
-                    return BankErrorCodeEnum.CanceledByUser;
+                    return ErrorCodeEnum.CanceledByUser;
                 case "0":
                     //result = "تراكنش با موفقيت انجام شد";
-                    return BankErrorCodeEnum.NoError;
+                    return ErrorCodeEnum.NoError;
                 case "11":
-                    return BankErrorCodeEnum.InvalidCardNumber;
+                    return ErrorCodeEnum.InvalidCardNumber;
                 //result = "شماره كارت نامعتبر است ";                    
                 case "12":
-                    return BankErrorCodeEnum.NoSufficientFunds;
+                    return ErrorCodeEnum.NoSufficientFunds;
                 //result = "موجودي كافي نيست ";                    
                 case "13":
-                    return BankErrorCodeEnum.InvalidPassword;
+                    return ErrorCodeEnum.InvalidPassword;
                 //result = "رمز نادرست است ";
                 //break;
                 case "14":
-                    return BankErrorCodeEnum.InvalidPassword;
+                    return ErrorCodeEnum.InvalidPassword;
 
                 //result = "تعداد دفعات وارد كردن رمز بيش از حد مجاز است ";
                 //break;
                 case "15":
-                    return BankErrorCodeEnum.InvalidCardNumber;
+                    return ErrorCodeEnum.InvalidCardNumber;
                 //result = "كارت نامعتبر است ";
                 //break;
                 case "16":
-                    return BankErrorCodeEnum.ExceedsWithdrawalAmountLimit;
+                    return ErrorCodeEnum.ExceedsWithdrawalAmountLimit;
 
                 //result = "دفعات برداشت وجه بيش از حد مجاز است ";
                 //break;
                 case "17":
-                    return BankErrorCodeEnum.CanceledByUser;
+                    return ErrorCodeEnum.CanceledByUser;
 
                 //result = "كاربر از انجام تراكنش منصرف شده است ";
                 //break;
                 case "18":
-                    return BankErrorCodeEnum.ExpiredCardPickUp;
+                    return ErrorCodeEnum.ExpiredCardPickUp;
 
                 //   result = "تاريخ انقضاي كارت گذشته است ";
                 //  break;
                 case "19":
-                    return BankErrorCodeEnum.ExceedsWithdrawalAmountLimit;
+                    return ErrorCodeEnum.ExceedsWithdrawalAmountLimit;
 
                 //result = "مبلغ برداشت وجه بيش از حد مجاز است ";
                 //break;
                 case "111":
-                    return BankErrorCodeEnum.BankIssuerIsInvalid;
+                    return ErrorCodeEnum.BankIssuerIsInvalid;
 
                 //                    result = "صادر كننده كارت نامعتبر است ";
                 //                   break;
                 case "112":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //  result = "خطاي سوييچ صادر كننده كارت ";
                 // break;
                 case "113":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "پاسخي از صادر كننده كارت دريافت نشد ";
                 //break;
                 case "114":
-                    return BankErrorCodeEnum.AllowablePINTriesExceededPickUp;
+                    return ErrorCodeEnum.AllowablePINTriesExceededPickUp;
 
 
                 //result = "دارنده كارت مجاز به انجام اين تراكنش نيست";
                 //break;
                 case "21":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "پذيرنده نامعتبر است ";
                 //break;
                 case "23":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "خطاي امنيتي رخ داده است ";
                 //break;
                 case "24":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "اطلاعات كاربري پذيرنده نامعتبر است ";
                 //break;
                 case "25":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "مبلغ نامعتبر است ";
                 //break;
                 case "31":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "پاسخ نامعتبر است ";
                 //break;
                 case "32":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "فرمت اطلاعات وارد شده صحيح نمي باشد ";
                 //break;
                 case "33":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "حساب نامعتبر است ";
                 //break;
                 case "34":
-                    return BankErrorCodeEnum.InternalError;
+                    return ErrorCodeEnum.InternalError;
 
                 //result = "خطاي سيستمي ";
                 //break;
                 case "35":
-                    return BankErrorCodeEnum.InvalidDate;
+                    return ErrorCodeEnum.InvalidDate;
 
                 //result = "تاريخ نامعتبر است ";
                 //break;
                 case "41":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "شماره درخواست تكراري است ، دوباره تلاش کنید";
                 //break;
                 case "42":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "يافت نشد  Sale تراكنش";
                 //break;
                 case "43":
-                    return BankErrorCodeEnum.AlreadyVerified;
+                    return ErrorCodeEnum.AlreadyVerified;
 
                 //result = "داده شده است  Verify قبلا درخواست";
                 //break;
                 case "44":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "يافت نشد  Verfiy درخواست";
                 //break;
                 case "45":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "شده است  Settle تراكنش";
                 //break;
                 case "46":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "نشده است  Settle تراكنش";
                 //break;
                 case "47":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "يافت نشد  Settle تراكنش";
                 //break;
                 case "48":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "شده است  Reverse تراكنش";
                 //break;
                 case "49":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "يافت نشد  Refund تراكنش";
                 //break;
                 case "412":
-                    return BankErrorCodeEnum.InvalidBillCode;
+                    return ErrorCodeEnum.InvalidBillCode;
 
                 //result = "شناسه قبض نادرست است ";
                 //break;
                 case "413":
-                    return BankErrorCodeEnum.InvalidPaymentCode;
+                    return ErrorCodeEnum.InvalidPaymentCode;
 
                 //result = "شناسه پرداخت نادرست است ";
                 //break;
                 case "414":
-                    return BankErrorCodeEnum.NoSuchIssuer;
+                    return ErrorCodeEnum.NoSuchIssuer;
 
                 //result = "سازمان صادر كننده قبض نامعتبر است ";
                 //break;
                 case "415":
-                    return BankErrorCodeEnum.ResponseReceivedTooLate;
+                    return ErrorCodeEnum.ResponseReceivedTooLate;
 
                 //result = "زمان جلسه كاري به پايان رسيده است ";
                 //break;
                 case "416":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "خطا در ثبت اطلاعات ";
                 //break;
                 case "417":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "شناسه پرداخت كننده نامعتبر است ";
                 //break;
                 case "418":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "اشكال در تعريف اطلاعات مشتري ";
                 //break;
                 case "419":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "تعداد دفعات ورود اطلاعات از حد مجاز گذشته است ";
                 //break;
                 case "421":
 
-                    return BankErrorCodeEnum.InvalidIP;
+                    return ErrorCodeEnum.InvalidIP;
 
                 //result = "نامعتبر است  IP";
                 //break;
                 case "51":
-                    return BankErrorCodeEnum.OperationAlreadyDone;
+                    return ErrorCodeEnum.OperationAlreadyDone;
 
                 //result = "تراكنش تكراري است ";
                 //break;
                 case "54":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "تراكنش مرجع موجود نيست ";
                 //break;
                 case "55":
-                    return BankErrorCodeEnum.InvalidTransaction;
+                    return ErrorCodeEnum.InvalidTransaction;
 
                 //result = "تراكنش نامعتبر است ";
                 //break;
                 case "61":
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
 
                 //result = "خطا در واريز ";
                 //break;
                 default:
-                    return BankErrorCodeEnum.UnkownError;
+                    return ErrorCodeEnum.UnkownError;
                     //result = string.Empty;
                     //break;
             }
-            return BankErrorCodeEnum.UnkownError;
+            return ErrorCodeEnum.UnkownError;
         }
 
 

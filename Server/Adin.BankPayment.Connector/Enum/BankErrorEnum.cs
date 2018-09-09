@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Adin.BankPayment.Connector.Enum
 {
-    public enum BankErrorCodeEnum
+    public enum ErrorCodeEnum
     {
 
         NoError = 0,
@@ -33,11 +33,10 @@ namespace Adin.BankPayment.Connector.Enum
         InvalidDate=22,
         InvalidTime=23,
         InternalError=24,
-        VerifyError = 100,
-        
-        //Parsian
+        VerifyError = 100,               
         InvalidPin = 200,//پين فروشنده درست نميباشد :
         OperationAlreadyDone = 201,//عمليات قبلا با موفقيت انجام شده است
-        UserTrackCodeIsInvalid= 202//شماره تراكنش فروشنده درست نميباشد
+        UserTrackCodeIsInvalid= 202,//شماره تراكنش فروشنده درست نميباشد        
+
     }
 }

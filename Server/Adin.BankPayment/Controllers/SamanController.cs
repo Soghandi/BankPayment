@@ -57,14 +57,14 @@ namespace Adin.BankPayment.Controllers
             string message = "";
             var refNum = Request.Form["RefNum"];
 
-            BankErrorCodeEnum bankErrorCode = BankErrorCodeEnum.UnkownError;
+            ErrorCodeEnum bankErrorCode = ErrorCodeEnum.UnkownError;
             try
             {
                 if (RequestUnpack())
                 {
                     if (_transactionState.Equals("OK"))
                     {
-                        bankErrorCode = BankErrorCodeEnum.NoError;
+                        bankErrorCode = ErrorCodeEnum.NoError;
                         transaction.BankErrorCode = (byte)bankErrorCode;
                         transaction.Status = (byte)TransactionStatusEnum.BankOk;
                         transaction.ModifiedOn = DateTime.Now;
@@ -91,98 +91,98 @@ namespace Adin.BankPayment.Controllers
                             // Transaction was canceled by user
                             _isError = true;
                             _errorMsg = "تراكنش توسط خريدار كنسل شد";
-                            bankErrorCode = BankErrorCodeEnum.CanceledByUser;
+                            bankErrorCode = ErrorCodeEnum.CanceledByUser;
                         }
                         //InvalidParameters
                         else if (_transactionState.Equals("InvalidParameters"))
                         {
                             // Amount of revers teransaction is more than teransaction
                             _errorMsg = "پارامترهای ارسال شده به بانک اشتباه است";
-                            bankErrorCode = BankErrorCodeEnum.InvalidParameters;
+                            bankErrorCode = ErrorCodeEnum.InvalidParameters;
                         }
                         else if (_transactionState.Equals("InvalidAmount"))
                         {
                             // Amount of revers teransaction is more than teransaction
                             _errorMsg = "مبلغ تراکنش معکوس بیشتر از مبلغ تراکنش است";
-                            bankErrorCode = BankErrorCodeEnum.InvalidAmount;
+                            bankErrorCode = ErrorCodeEnum.InvalidAmount;
                         }
                         else if (_transactionState.Equals("InvalidTransaction"))
                         {
                             // Can not find teransaction
                             _errorMsg = "تراکنش معتبر نمی باشد";
-                            bankErrorCode = BankErrorCodeEnum.InvalidTransaction;
+                            bankErrorCode = ErrorCodeEnum.InvalidTransaction;
                         }
                         else if (_transactionState.Equals("InvalidCardNumber"))
                         {
                             // Card number is wrong
                             _errorMsg = "شماره کارت معتبر نمی باشد";
-                            bankErrorCode = BankErrorCodeEnum.InvalidCardNumber;
+                            bankErrorCode = ErrorCodeEnum.InvalidCardNumber;
                         }
                         else if (_transactionState.Equals("NoSuchIssuer"))
                         {
                             // Issuer can not find
                             _errorMsg = "صادر کننده پیدا نشد";
-                            bankErrorCode = BankErrorCodeEnum.NoSuchIssuer;
+                            bankErrorCode = ErrorCodeEnum.NoSuchIssuer;
                         }
                         else if (_transactionState.Equals("ExpiredCardPickUp"))
                         {
                             // The card is expired
                             _errorMsg = "کارت انتخاب شده منقضی شده است";
-                            bankErrorCode = BankErrorCodeEnum.ExpiredCardPickUp;
+                            bankErrorCode = ErrorCodeEnum.ExpiredCardPickUp;
                         }
                         else if (_transactionState.Equals("AllowablePINTriesExceededPickUp"))
                         {
                             // For third time user enter a wrong PIN so card become invalid
                             _errorMsg = "پین انتخاب شده محدودیت کارت دارد";
-                            bankErrorCode = BankErrorCodeEnum.AllowablePINTriesExceededPickUp;
+                            bankErrorCode = ErrorCodeEnum.AllowablePINTriesExceededPickUp;
                         }
                         else if (_transactionState.Equals("IncorrectPIN"))
                         {
                             // Pin card is wrong
                             _errorMsg = "پین کد اشتباه است";
-                            bankErrorCode = BankErrorCodeEnum.IncorrectPIN;
+                            bankErrorCode = ErrorCodeEnum.IncorrectPIN;
                         }
                         else if (_transactionState.Equals("ExceedsWithdrawalAmountLimit"))
                         {
                             // Exceeds withdrawal from amount limit
                             _errorMsg = "پرداخت بیشتر از از حد مجاز می باشد";
-                            bankErrorCode = BankErrorCodeEnum.ExceedsWithdrawalAmountLimit;
+                            bankErrorCode = ErrorCodeEnum.ExceedsWithdrawalAmountLimit;
                         }
                         else if (_transactionState.Equals("TransactionCannotBeCompleted"))
                         {
                             // PIN and PAD are currect but Transaction Cannot Be Completed
                             _errorMsg = "تراکنش کامل نشد";
-                            bankErrorCode = BankErrorCodeEnum.TransactionCannotBeCompleted;
+                            bankErrorCode = ErrorCodeEnum.TransactionCannotBeCompleted;
                         }
                         else if (_transactionState.Equals("ResponseReceivedTooLate"))
                         {
                             // Timeout occur
                             _errorMsg = "جواب کاربر بیشتر از حد مجاز طول کشید";
-                            bankErrorCode = BankErrorCodeEnum.ResponseReceivedTooLate;
+                            bankErrorCode = ErrorCodeEnum.ResponseReceivedTooLate;
                         }
                         else if (_transactionState.Equals("SuspectedFraudPickUp"))
                         {
                             // User did not insert cvv2 & expiredate or they are wrong.
                             _errorMsg = "کاربر اطلاعات کارت خود را به درستی وارد نکرده است";
-                            bankErrorCode = BankErrorCodeEnum.SuspectedFraudPickUp;
+                            bankErrorCode = ErrorCodeEnum.SuspectedFraudPickUp;
                         }
                         else if (_transactionState.Equals("NoSufficientFunds"))
                         {
                             // there are not suficient funds in the account
                             _errorMsg = "موجودی کافی نمی باشد";
-                            bankErrorCode = BankErrorCodeEnum.NoSufficientFunds;
+                            bankErrorCode = ErrorCodeEnum.NoSufficientFunds;
                         }
                         else if (_transactionState.Equals("IssuerDownSlm"))
                         {
                             // The bank server is down
                             _errorMsg = "سرور بانک غیرفعال است";
-                            bankErrorCode = BankErrorCodeEnum.BankServerIsDown;
+                            bankErrorCode = ErrorCodeEnum.BankServerIsDown;
                         }
                         else if (_transactionState.Equals("TMEError"))
                         {
                             // unknown error occur
                             _errorMsg = "خطای ناشناخته";
-                            bankErrorCode = BankErrorCodeEnum.UnkownError;
+                            bankErrorCode = ErrorCodeEnum.UnkownError;
                         }
                     }
                 }

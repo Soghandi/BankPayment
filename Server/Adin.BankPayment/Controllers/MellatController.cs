@@ -78,7 +78,7 @@ namespace Adin.BankPayment.Controllers
             _logger.LogError(longurl);
             if (string.IsNullOrEmpty(Request.Form["SaleReferenceId"].ToString()))
             {
-                var bankErrorCode = BankErrorCodeEnum.UnkownError;
+                var bankErrorCode = ErrorCodeEnum.UnkownError;
                 var _errorMsg = "رسید قابل قبول نیست";
                 //ResCode=StatusPayment
                 if (!string.IsNullOrEmpty(Request.Form["ResCode"].ToString()))
@@ -118,11 +118,11 @@ namespace Adin.BankPayment.Controllers
                     {
                         _logger.LogError(ex.Message);
                         var message = " وضعیت:مشکلی در پرداخت بوجود آمده ، در صورتی که وجه پرداختی از حساب بانکی شما کسر شده است آن مبلغ به صورت خودکار برگشت داده خواهد شد ";
-                        return await ReturnErrorPage(transaction, (byte)BankErrorCodeEnum.UnkownError, message);
+                        return await ReturnErrorPage(transaction, (byte)ErrorCodeEnum.UnkownError, message);
                     }
 
 
-                    var bankErrorCode = BankErrorCodeEnum.NoError;
+                    var bankErrorCode = ErrorCodeEnum.NoError;
                     transaction.BankErrorCode = (byte)bankErrorCode;
                     transaction.Status = (byte)TransactionStatusEnum.BankOk;
                     transaction.ModifiedOn = DateTime.Now;
@@ -150,7 +150,7 @@ namespace Adin.BankPayment.Controllers
                 {
                     _logger.LogError(ex.Message);
                     var message = "مشکلی در پرداخت به وجود آمده است ، در صورتیکه وجه پرداختی از حساب بانکی شما کسر شده است آن مبلغ به صورت خودکار برگشت داده خواهد شد";
-                    return await ReturnErrorPage(transaction, (byte)BankErrorCodeEnum.UnkownError, message);
+                    return await ReturnErrorPage(transaction, (byte)ErrorCodeEnum.UnkownError, message);
                 }
             }
         }

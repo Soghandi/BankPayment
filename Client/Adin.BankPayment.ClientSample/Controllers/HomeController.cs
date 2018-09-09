@@ -52,7 +52,7 @@ namespace Adin.BankPayment.ClientSample.Controllers
     if (status == false)
     {
         int errorCode = int.Parse(Request.Query["errorCode"]);
-        BankErrorCodeEnum errCode = (BankErrorCodeEnum)errorCode;
+        ErrorCodeEnum errCode = (ErrorCodeEnum)errorCode;
         ViewBag.Result = message;
     }
     else

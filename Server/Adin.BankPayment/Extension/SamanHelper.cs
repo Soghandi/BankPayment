@@ -62,7 +62,7 @@ namespace Adin.BankPayment.Extension
                 await _transactionRepository.Update(transaction);
 
                 verifyTransactionResult.Status = true;
-                verifyTransactionResult.ErrorCode = (byte)BankErrorCodeEnum.NoError;
+                verifyTransactionResult.ErrorCode = (byte)ErrorCodeEnum.NoError;
                 verifyTransactionResult.Message = message;
 
                 return verifyTransactionResult;
@@ -80,7 +80,7 @@ namespace Adin.BankPayment.Extension
                 await _transactionRepository.Update(transaction);
 
                 verifyTransactionResult.Status = false;
-                verifyTransactionResult.ErrorCode = (byte)BankErrorCodeEnum.VerifyError;
+                verifyTransactionResult.ErrorCode = (byte)ErrorCodeEnum.VerifyError;
                 verifyTransactionResult.Message = _errorMsg;
                 return verifyTransactionResult;
                
