@@ -8,6 +8,7 @@
         BankOk = 3,
         ErrorOnVerify = 4,
         ReverseTransaction = 5,
-        WaitingForSettle = 6
+        WaitingForSettle = 6,
+        CanceledByOwner = 7
     }
 }
