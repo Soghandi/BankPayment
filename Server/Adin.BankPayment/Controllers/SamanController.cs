@@ -46,7 +46,8 @@ namespace Adin.BankPayment.Controllers
             _logger.LogDebug("secondTrackCode:" + secondTrackCode);
             Transaction transaction = await _transactionRepository.Get(Guid.Parse(secondTrackCode));
 
-            if (transaction.Status == (byte)TransactionStatusEnum.Success)
+            if (transaction.Status == (byte)TransactionStatusEnum.Success ||
+                transaction.Status == (byte)TransactionStatusEnum.Cancel)
             {
                 return BadRequest();
             }

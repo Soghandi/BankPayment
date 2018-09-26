@@ -1,36 +1,34 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using System.Security.Cryptography.X509Certificates;
-using System.Net.Security;
-using Microsoft.Extensions.Logging;
-using Adin.BankPayment.Service;
+﻿using Adin.BankPayment.Connector.Enum;
 using Adin.BankPayment.Domain.Model;
-using Adin.BankPayment.Connector.Enum;
-using System.Web;
 using Adin.BankPayment.Extension;
-using Adin.BankPayment.Mellat;
+using Adin.BankPayment.Service;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Specialized;
+using System.Linq;
+using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
+using System.Web;
 
 namespace Adin.BankPayment.Controllers
 {
     public class MellatController : Controller
     {
-        private string _referenceNumber = string.Empty;
-        private string _reservationNumber = string.Empty;
-        private string _transactionState = string.Empty;
-        private string _traceNumber = string.Empty;
-        private bool _isError = false;
-        private string _succeedMsg = "";
-        private string _webBaseUrl = "";
+        private readonly string _referenceNumber = string.Empty;
+        private readonly string _reservationNumber = string.Empty;
+        private readonly string _transactionState = string.Empty;
+        private readonly string _traceNumber = string.Empty;
+        private readonly bool _isError = false;
+        private readonly string _succeedMsg = "";
+        private readonly string _webBaseUrl = "";
         private readonly ILogger<MellatController> _logger;
         private IRepository<Transaction> _transactionRepository;
-        private IRepository<Application> _applicationRepository;
-        private IRepository<Bank> _bankRepository;
+        private readonly IRepository<Application> _applicationRepository;
+        private readonly IRepository<Bank> _bankRepository;
         private IRepository<ApplicationBank> _applicationBankRepository;
-
 
         public MellatController(ILogger<MellatController> logger,
                                IRepository<Transaction> transactionRepository,
@@ -43,9 +41,7 @@ namespace Adin.BankPayment.Controllers
             _applicationRepository = applicationRepository;
             _bankRepository = bankRepository;
             _applicationBankRepository = applicationBankRepository;
-
         }
-
 
         [HttpPost]
         public async Task<IActionResult> Callback()
@@ -64,10 +60,11 @@ namespace Adin.BankPayment.Controllers
             _logger.LogInformation(Request.Form["ResCode"].ToString());
             _logger.LogInformation(Request.Form["SaleOrderId"].ToString());
             _logger.LogInformation(Request.Form["SaleReferenceId"].ToString());
-          
 
             Transaction transaction = await _transactionRepository.Get(Guid.Parse(secondTrackCode));
-            if (transaction.Status != (byte)TransactionStatusEnum.Initial)
+
+            if (transaction.Status == (byte)TransactionStatusEnum.Success ||
+                 transaction.Status == (byte)TransactionStatusEnum.Cancel)
             {
                 return BadRequest();
             }
@@ -89,10 +86,9 @@ namespace Adin.BankPayment.Controllers
                 }
 
                 return await ReturnErrorPage(transaction, (byte)bankErrorCode, _errorMsg);
-
             }
             else
-            {                
+            {
                 try
                 {
                     var applicationBank = await _applicationBankRepository.GetFirstBy(x => x.ApplicationId == transaction.ApplicationId && x.BankId == transaction.BankId);
@@ -121,7 +117,6 @@ namespace Adin.BankPayment.Controllers
                         return await ReturnErrorPage(transaction, (byte)ErrorCodeEnum.UnkownError, message);
                     }
 
-
                     var bankErrorCode = ErrorCodeEnum.NoError;
                     transaction.BankErrorCode = (byte)bankErrorCode;
                     transaction.Status = (byte)TransactionStatusEnum.BankOk;
@@ -131,7 +126,6 @@ namespace Adin.BankPayment.Controllers
                     transaction.BankTrackCode = Request.Form["SaleReferenceId"].ToString();
 
                     await _transactionRepository.Update(transaction);
-
 
                     query["id"] = transaction.Id.ToString();
                     query["trackCode"] = transaction.UserTrackCode.ToString();
@@ -168,33 +162,28 @@ namespace Adin.BankPayment.Controllers
                 };
         }
 
-
         public async Task<IActionResult> ReturnErrorPage(Transaction transaction, byte bankErrorCode, string errorMessage = "")
         {
-
             string longurl = transaction.CallbackUrl;
             var uriBuilder = new UriBuilder(longurl);
             NameValueCollection query = HttpUtility.ParseQueryString(uriBuilder.Query);
 
-
             transaction.Status = (byte)TransactionStatusEnum.Failed;
-            transaction.BankErrorCode = (byte)bankErrorCode;
+            transaction.BankErrorCode = bankErrorCode;
             transaction.BankErrorMessage = errorMessage;
             transaction.ModifiedOn = DateTime.Now;
             transaction.ModifiedBy = 1;
             await _transactionRepository.Update(transaction);
 
-
             query["id"] = transaction.Id.ToString();
             query["trackCode"] = transaction.UserTrackCode.ToString();
             query["status"] = false.ToString();
-            query["errorCode"] = ((byte)bankErrorCode).ToString();
+            query["errorCode"] = bankErrorCode.ToString();
             query["message"] = errorMessage;
             uriBuilder.Query = query.ToString();
             longurl = uriBuilder.ToString();
             var url = string.Format(longurl);
             return Redirect(url);
         }
-
     }
 }
