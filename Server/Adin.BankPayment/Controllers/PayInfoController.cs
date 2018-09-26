@@ -1,16 +1,14 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Adin.BankPayment.Service;
-using Adin.BankPayment.Domain.Model;
-using System.Linq;
-using Adin.BankPayment.Connector;
-using Adin.BankPayment.Connector.Enum;
+﻿using Adin.BankPayment.Connector.Enum;
 using Adin.BankPayment.Connector.Model;
+using Adin.BankPayment.Domain.Model;
 using Adin.BankPayment.Extension;
-using Microsoft.Extensions.Caching.Memory;
+using Adin.BankPayment.Service;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
 
 namespace Adin.BankPayment.Controllers
 {
@@ -19,11 +17,9 @@ namespace Adin.BankPayment.Controllers
     {
         private readonly ILogger<PayController> _logger;
         private IRepository<Transaction> _transactionRepository;
-        private IRepository<Application> _applicationRepository;
+        private readonly IRepository<Application> _applicationRepository;
         private IRepository<Bank> _bankRepository;
         private IRepository<ApplicationBank> _applicationBankRepository;
-
-
 
         public PayInfoController(IMemoryCache memCaches,
                              ILogger<PayController> logger,
@@ -123,9 +119,7 @@ namespace Adin.BankPayment.Controllers
                     _logger.LogError(ex.InnerException.Message);
                 throw;
             }
-
         }
-
 
         [HttpGet]
         [Authorize]
@@ -157,7 +151,6 @@ namespace Adin.BankPayment.Controllers
                         SamanHelper samanHelper = new SamanHelper(_logger, _transactionRepository, _applicationRepository, _bankRepository, _applicationBankRepository);
                         VerifyTransactionResponseModel result = await samanHelper.VerifyTransaction(transaction);
                         return Ok(result);
-
                 }
             }
             catch (Exception ex)
@@ -167,9 +160,7 @@ namespace Adin.BankPayment.Controllers
                     _logger.LogError(ex.InnerException.Message);
                 throw;
             }
-
         }
-
 
         [HttpGet]
         [Authorize]
@@ -206,7 +197,7 @@ namespace Adin.BankPayment.Controllers
                 return Ok(new CancelPaymentResponseModel
                 {
                     ErrorCode = (byte)ErrorCodeEnum.NoError,
-                    Message = "پرداخت با موفقیت کنسل شذ ",
+                    Message = "پرداخت با موفقیت کنسل شد ",
                     Status = true
                 });
             }
@@ -217,10 +208,6 @@ namespace Adin.BankPayment.Controllers
                     _logger.LogError(ex.InnerException.Message);
                 throw;
             }
-
         }
-
-
     }
 }
-

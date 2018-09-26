@@ -1,14 +1,13 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Adin.BankPayment.Service;
+﻿using Adin.BankPayment.Connector.Enum;
 using Adin.BankPayment.Domain.Model;
-using System.Linq;
-using Adin.BankPayment.Connector.Enum;
 using Adin.BankPayment.Extension;
 using Adin.BankPayment.Mellat;
-using Microsoft.Extensions.Caching.Memory;
+using Adin.BankPayment.Service;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Adin.BankPayment.Controllers
 {
@@ -17,11 +16,9 @@ namespace Adin.BankPayment.Controllers
     {
         private readonly ILogger<PayController> _logger;
         private IRepository<Transaction> _transactionRepository;
-        private IRepository<Application> _applicationRepository;
-        private IRepository<Bank> _bankRepository;
+        private readonly IRepository<Application> _applicationRepository;
+        private readonly IRepository<Bank> _bankRepository;
         private IRepository<ApplicationBank> _applicationBankRepository;
-
-
 
         public PayController(ILogger<PayController> logger,
                              IRepository<Transaction> transactionRepository,
@@ -44,12 +41,17 @@ namespace Adin.BankPayment.Controllers
             {
                 return Unauthorized();
             }
-            if (transaction.ExpirationTime != null && transaction.ExpirationTime < DateTime.Now)
+            if (transaction.Status == (byte)TransactionStatusEnum.Success ||
+                 transaction.Status == (byte)TransactionStatusEnum.BankOk ||
+                 transaction.Status == (byte)TransactionStatusEnum.Cancel ||
+                 (transaction.ExpirationTime.HasValue &&
+                 transaction.ExpirationTime < DateTime.Now))
+            {
                 return Unauthorized();
+            }
             var applicationBank = await _applicationBankRepository.GetFirstBy(x => x.ApplicationId == transaction.ApplicationId && x.BankId == transaction.BankId);
             switch (transaction.Bank.Code)
             {
-
                 case (byte)BankCodeEnum.Parsian:
                     _logger.LogInformation("Parsian");
                     var pinParam = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "ParsianPIN");
@@ -88,6 +90,7 @@ namespace Adin.BankPayment.Controllers
                         await _transactionRepository.Update(transaction);
                         return BadRequest(transaction.BankErrorMessage);
                     }
+
                 case (byte)BankCodeEnum.Mellat:
                     _logger.LogInformation("mellat");
                     var termialParam = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatTerminalId");
@@ -134,6 +137,7 @@ namespace Adin.BankPayment.Controllers
                         await _transactionRepository.Update(transaction);
                         return BadRequest(transaction.BankErrorMessage);
                     }
+
                 case (byte)BankCodeEnum.Saman:
                 default:
                     _logger.LogInformation("Saman");
@@ -141,8 +145,5 @@ namespace Adin.BankPayment.Controllers
                     return View("Saman", transaction);
             }
         }
-
-
     }
 }
-
