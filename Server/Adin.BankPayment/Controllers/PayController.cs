@@ -6,6 +6,7 @@ using Adin.BankPayment.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -37,18 +38,28 @@ namespace Adin.BankPayment.Controllers
         public async Task<IActionResult> Index(Guid id)
         {
             var transaction = await _transactionRepository.Get(id);
-            if (transaction == null)
+            if (transaction == null ||
+                transaction.Status == (byte)TransactionStatusEnum.Cancel)
             {
-                return Unauthorized();
+                return View("Error", "لینک وارد شده صحیح نیست.");
             }
+
             if (transaction.Status == (byte)TransactionStatusEnum.Success ||
-                 transaction.Status == (byte)TransactionStatusEnum.BankOk ||
-                 transaction.Status == (byte)TransactionStatusEnum.Cancel ||
-                 (transaction.ExpirationTime.HasValue &&
-                 transaction.ExpirationTime < DateTime.Now))
+                 transaction.Status == (byte)TransactionStatusEnum.BankOk)
             {
-                return Unauthorized();
+                return View("Error", "این تراکنش قبلا پرداخت شده است.");
             }
+
+            if (transaction.ExpirationTime.HasValue &&
+                 transaction.ExpirationTime < DateTime.Now)
+            {
+                PersianCalendar persianCalendar = new PersianCalendar();
+                string date = $"{persianCalendar.GetYear(transaction.ExpirationTime.Value)}/{persianCalendar.GetMonth(transaction.ExpirationTime.Value)}/" +
+                    $"{persianCalendar.GetDayOfMonth(transaction.ExpirationTime.Value)}" +
+                    $" - {transaction.ExpirationTime.Value.Hour}:{transaction.ExpirationTime.Value.Minute}";
+                return View("Error", $"این لینک تا تاریخ {date} معتبر بوده است، لطفا از پشتیبانی تقاضای لینک جدید بفرمایید.");
+            }
+
             var applicationBank = await _applicationBankRepository.GetFirstBy(x => x.ApplicationId == transaction.ApplicationId && x.BankId == transaction.BankId);
             switch (transaction.Bank.Code)
             {
