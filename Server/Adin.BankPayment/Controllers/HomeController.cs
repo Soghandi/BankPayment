@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using System.Diagnostics;
 using Adin.BankPayment.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace Adin.BankPayment.Controllers
@@ -21,8 +17,6 @@ namespace Adin.BankPayment.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-         
-          
             _logger.LogInformation("Index page says hello");
             return View();
         }
@@ -43,7 +37,7 @@ namespace Adin.BankPayment.Controllers
 
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
         }
     }
 }

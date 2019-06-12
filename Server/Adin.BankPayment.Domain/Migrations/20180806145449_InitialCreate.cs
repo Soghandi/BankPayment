@@ -8,13 +8,13 @@ namespace Adin.BankPayment.Domain.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Application",
-                columns: table => new
+                "Application",
+                table => new
                 {
-                    Id = table.Column<Guid>(nullable: false),
-                    Status = table.Column<byte>(nullable: false),
-                    CreationDate = table.Column<DateTime>(nullable: false),
-                    CreatedBy = table.Column<int>(nullable: false),
+                    Id = table.Column<Guid>(),
+                    Status = table.Column<byte>(),
+                    CreationDate = table.Column<DateTime>(),
+                    CreatedBy = table.Column<int>(),
                     ModifiedOn = table.Column<DateTime>(nullable: true),
                     ModifiedBy = table.Column<int>(nullable: true),
                     RowVersion = table.Column<byte[]>(rowVersion: true, nullable: true),
@@ -24,120 +24,114 @@ namespace Adin.BankPayment.Domain.Migrations
                     PublicKey = table.Column<string>(maxLength: 128, nullable: true),
                     PrivateKey = table.Column<string>(maxLength: 128, nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Application", x => x.Id);
-                });
+                constraints: table => { table.PrimaryKey("PK_Application", x => x.Id); });
 
             migrationBuilder.CreateTable(
-                name: "Bank",
-                columns: table => new
+                "Bank",
+                table => new
                 {
-                    Id = table.Column<Guid>(nullable: false),
-                    Status = table.Column<byte>(nullable: false),
-                    CreationDate = table.Column<DateTime>(nullable: false),
-                    CreatedBy = table.Column<int>(nullable: false),
+                    Id = table.Column<Guid>(),
+                    Status = table.Column<byte>(),
+                    CreationDate = table.Column<DateTime>(),
+                    CreatedBy = table.Column<int>(),
                     ModifiedOn = table.Column<DateTime>(nullable: true),
                     ModifiedBy = table.Column<int>(nullable: true),
                     RowVersion = table.Column<byte[]>(rowVersion: true, nullable: true),
                     IsDeleted = table.Column<bool>(nullable: false, defaultValue: false),
                     Title = table.Column<string>(maxLength: 16, nullable: true),
                     PostUrl = table.Column<string>(maxLength: 64, nullable: true),
-                    Code = table.Column<byte>(nullable: false)
+                    Code = table.Column<byte>()
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Bank", x => x.Id);
-                });
+                constraints: table => { table.PrimaryKey("PK_Bank", x => x.Id); });
 
             migrationBuilder.CreateTable(
-                name: "ApplicationBank",
-                columns: table => new
+                "ApplicationBank",
+                table => new
                 {
-                    Id = table.Column<Guid>(nullable: false),
-                    Status = table.Column<byte>(nullable: false),
-                    CreationDate = table.Column<DateTime>(nullable: false),
-                    CreatedBy = table.Column<int>(nullable: false),
+                    Id = table.Column<Guid>(),
+                    Status = table.Column<byte>(),
+                    CreationDate = table.Column<DateTime>(),
+                    CreatedBy = table.Column<int>(),
                     ModifiedOn = table.Column<DateTime>(nullable: true),
                     ModifiedBy = table.Column<int>(nullable: true),
                     RowVersion = table.Column<byte[]>(rowVersion: true, nullable: true),
                     IsDeleted = table.Column<bool>(nullable: false, defaultValue: false),
-                    ApplicationId = table.Column<Guid>(nullable: false),
-                    BankId = table.Column<Guid>(nullable: false)
+                    ApplicationId = table.Column<Guid>(),
+                    BankId = table.Column<Guid>()
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ApplicationBank", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ApplicationBank_Application_ApplicationId",
-                        column: x => x.ApplicationId,
-                        principalTable: "Application",
-                        principalColumn: "Id",
+                        "FK_ApplicationBank_Application_ApplicationId",
+                        x => x.ApplicationId,
+                        "Application",
+                        "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ApplicationBank_Bank_BankId",
-                        column: x => x.BankId,
-                        principalTable: "Bank",
-                        principalColumn: "Id",
+                        "FK_ApplicationBank_Bank_BankId",
+                        x => x.BankId,
+                        "Bank",
+                        "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Transaction",
-                columns: table => new
+                "Transaction",
+                table => new
                 {
-                    Id = table.Column<Guid>(nullable: false),
-                    Status = table.Column<byte>(nullable: false),
-                    CreationDate = table.Column<DateTime>(nullable: false),
-                    CreatedBy = table.Column<int>(nullable: false),
+                    Id = table.Column<Guid>(),
+                    Status = table.Column<byte>(),
+                    CreationDate = table.Column<DateTime>(),
+                    CreatedBy = table.Column<int>(),
                     ModifiedOn = table.Column<DateTime>(nullable: true),
                     ModifiedBy = table.Column<int>(nullable: true),
                     RowVersion = table.Column<byte[]>(rowVersion: true, nullable: true),
                     IsDeleted = table.Column<bool>(nullable: false, defaultValue: false),
-                    ApplicationId = table.Column<Guid>(nullable: false),
-                    BankId = table.Column<Guid>(nullable: false),
-                    Amount = table.Column<decimal>(nullable: false),
+                    ApplicationId = table.Column<Guid>(),
+                    BankId = table.Column<Guid>(),
+                    Amount = table.Column<decimal>(),
                     Mobile = table.Column<long>(nullable: true),
                     UserTrackCode = table.Column<string>(maxLength: 64, nullable: true),
                     BankTrackCode = table.Column<string>(maxLength: 64, nullable: true),
                     ReferenceNumber = table.Column<string>(maxLength: 64, nullable: true),
-                    BankErrorCode = table.Column<int>(nullable: false),
+                    BankErrorCode = table.Column<int>(),
                     BankRedirectUrl = table.Column<string>(maxLength: 128, nullable: true),
                     CallbackUrl = table.Column<string>(maxLength: 128, nullable: true),
                     ExpirationTime = table.Column<DateTime>(nullable: true),
                     BankErrorMessage = table.Column<string>(maxLength: 64, nullable: true),
-                    ErrorCode = table.Column<byte>(nullable: false)
+                    ErrorCode = table.Column<byte>()
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Transaction", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Transaction_Application_ApplicationId",
-                        column: x => x.ApplicationId,
-                        principalTable: "Application",
-                        principalColumn: "Id",
+                        "FK_Transaction_Application_ApplicationId",
+                        x => x.ApplicationId,
+                        "Application",
+                        "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Transaction_Bank_BankId",
-                        column: x => x.BankId,
-                        principalTable: "Bank",
-                        principalColumn: "Id",
+                        "FK_Transaction_Bank_BankId",
+                        x => x.BankId,
+                        "Bank",
+                        "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ApplicationBankParam",
-                columns: table => new
+                "ApplicationBankParam",
+                table => new
                 {
-                    Id = table.Column<Guid>(nullable: false),
-                    Status = table.Column<byte>(nullable: false),
-                    CreationDate = table.Column<DateTime>(nullable: false),
-                    CreatedBy = table.Column<int>(nullable: false),
+                    Id = table.Column<Guid>(),
+                    Status = table.Column<byte>(),
+                    CreationDate = table.Column<DateTime>(),
+                    CreatedBy = table.Column<int>(),
                     ModifiedOn = table.Column<DateTime>(nullable: true),
                     ModifiedBy = table.Column<int>(nullable: true),
                     RowVersion = table.Column<byte[]>(rowVersion: true, nullable: true),
                     IsDeleted = table.Column<bool>(nullable: false, defaultValue: false),
-                    ApplicationBankId = table.Column<Guid>(nullable: false),
+                    ApplicationBankId = table.Column<Guid>(),
                     ParamKey = table.Column<string>(maxLength: 32, nullable: true),
                     ParamValue = table.Column<string>(maxLength: 128, nullable: true)
                 },
@@ -145,70 +139,97 @@ namespace Adin.BankPayment.Domain.Migrations
                 {
                     table.PrimaryKey("PK_ApplicationBankParam", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ApplicationBankParam_ApplicationBank_ApplicationBankId",
-                        column: x => x.ApplicationBankId,
-                        principalTable: "ApplicationBank",
-                        principalColumn: "Id",
+                        "FK_ApplicationBankParam_ApplicationBank_ApplicationBankId",
+                        x => x.ApplicationBankId,
+                        "ApplicationBank",
+                        "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
-                table: "Bank",
-                columns: new[] { "Id", "Code", "CreatedBy", "CreationDate", "IsDeleted", "ModifiedBy", "ModifiedOn", "PostUrl", "RowVersion", "Status", "Title" },
-                values: new object[] { new Guid("482a591e-7536-4f47-a544-e9d4342586bd"), (byte)1, 1, new DateTime(2018, 8, 6, 19, 24, 49, 523, DateTimeKind.Local), false, null, null, "https://sep.shaparak.ir/MobilePG/MobilePayment", null, (byte)0, "سامان" });
+                "Bank",
+                new[]
+                {
+                    "Id", "Code", "CreatedBy", "CreationDate", "IsDeleted", "ModifiedBy", "ModifiedOn", "PostUrl",
+                    "RowVersion", "Status", "Title"
+                },
+                new object[]
+                {
+                    new Guid("482a591e-7536-4f47-a544-e9d4342586bd"), (byte) 1, 1,
+                    new DateTime(2018, 8, 6, 19, 24, 49, 523, DateTimeKind.Local), false, null, null,
+                    "https://sep.shaparak.ir/MobilePG/MobilePayment", null, (byte) 0, "سامان"
+                });
 
             migrationBuilder.InsertData(
-                table: "Bank",
-                columns: new[] { "Id", "Code", "CreatedBy", "CreationDate", "IsDeleted", "ModifiedBy", "ModifiedOn", "PostUrl", "RowVersion", "Status", "Title" },
-                values: new object[] { new Guid("ab3f226a-be56-4092-bbd0-2ae8ffbce131"), (byte)2, 1, new DateTime(2018, 8, 6, 19, 24, 49, 525, DateTimeKind.Local), false, null, null, "https://pec.shaparak.ir/pecpaymentgateway/default.aspx?au={0}", null, (byte)0, "پارسیان" });
+                "Bank",
+                new[]
+                {
+                    "Id", "Code", "CreatedBy", "CreationDate", "IsDeleted", "ModifiedBy", "ModifiedOn", "PostUrl",
+                    "RowVersion", "Status", "Title"
+                },
+                new object[]
+                {
+                    new Guid("ab3f226a-be56-4092-bbd0-2ae8ffbce131"), (byte) 2, 1,
+                    new DateTime(2018, 8, 6, 19, 24, 49, 525, DateTimeKind.Local), false, null, null,
+                    "https://pec.shaparak.ir/pecpaymentgateway/default.aspx?au={0}", null, (byte) 0, "پارسیان"
+                });
 
             migrationBuilder.InsertData(
-                table: "Bank",
-                columns: new[] { "Id", "Code", "CreatedBy", "CreationDate", "IsDeleted", "ModifiedBy", "ModifiedOn", "PostUrl", "RowVersion", "Status", "Title" },
-                values: new object[] { new Guid("98504148-3d89-4abb-9fb5-281bed8714e3"), (byte)3, 1, new DateTime(2018, 8, 6, 19, 24, 49, 525, DateTimeKind.Local), false, null, null, "https://bpm.shaparak.ir/pgwchannel/startpay.mellat", null, (byte)0, "ملت" });
+                "Bank",
+                new[]
+                {
+                    "Id", "Code", "CreatedBy", "CreationDate", "IsDeleted", "ModifiedBy", "ModifiedOn", "PostUrl",
+                    "RowVersion", "Status", "Title"
+                },
+                new object[]
+                {
+                    new Guid("98504148-3d89-4abb-9fb5-281bed8714e3"), (byte) 3, 1,
+                    new DateTime(2018, 8, 6, 19, 24, 49, 525, DateTimeKind.Local), false, null, null,
+                    "https://bpm.shaparak.ir/pgwchannel/startpay.mellat", null, (byte) 0, "ملت"
+                });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApplicationBank_ApplicationId",
-                table: "ApplicationBank",
-                column: "ApplicationId");
+                "IX_ApplicationBank_ApplicationId",
+                "ApplicationBank",
+                "ApplicationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApplicationBank_BankId",
-                table: "ApplicationBank",
-                column: "BankId");
+                "IX_ApplicationBank_BankId",
+                "ApplicationBank",
+                "BankId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApplicationBankParam_ApplicationBankId",
-                table: "ApplicationBankParam",
-                column: "ApplicationBankId");
+                "IX_ApplicationBankParam_ApplicationBankId",
+                "ApplicationBankParam",
+                "ApplicationBankId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Transaction_ApplicationId",
-                table: "Transaction",
-                column: "ApplicationId");
+                "IX_Transaction_ApplicationId",
+                "Transaction",
+                "ApplicationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Transaction_BankId",
-                table: "Transaction",
-                column: "BankId");
+                "IX_Transaction_BankId",
+                "Transaction",
+                "BankId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ApplicationBankParam");
+                "ApplicationBankParam");
 
             migrationBuilder.DropTable(
-                name: "Transaction");
+                "Transaction");
 
             migrationBuilder.DropTable(
-                name: "ApplicationBank");
+                "ApplicationBank");
 
             migrationBuilder.DropTable(
-                name: "Application");
+                "Application");
 
             migrationBuilder.DropTable(
-                name: "Bank");
+                "Bank");
         }
     }
 }

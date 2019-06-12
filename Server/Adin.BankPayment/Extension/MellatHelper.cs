@@ -1,148 +1,141 @@
-﻿
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Adin.BankPayment.Connector.Enum;
 using Adin.BankPayment.Connector.Model;
 using Adin.BankPayment.Domain.Model;
 using Adin.BankPayment.Mellat;
 using Adin.BankPayment.Service;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Adin.BankPayment.Extension
 {
-    public class MellatHelper : BankHelper
+    public class MellatHelper : IBankHelper
     {
-
+        private readonly IRepository<ApplicationBank> _applicationBankRepository;
         private readonly ILogger _logger;
-        private IRepository<Transaction> _transactionRepository;
-        private IRepository<Application> _applicationRepository;
-        private IRepository<Bank> _bankRepository;
-        private IRepository<ApplicationBank> _applicationBankRepository;
+        private readonly IRepository<Transaction> _transactionRepository;
+
         public MellatHelper(ILogger logger,
-                               IRepository<Transaction> transactionRepository,
-                               IRepository<Application> applicationRepository,
-                               IRepository<Bank> bankRepository,
-                               IRepository<ApplicationBank> applicationBankRepository)
+            IRepository<Transaction> transactionRepository,
+            IRepository<ApplicationBank> applicationBankRepository)
         {
             _logger = logger;
             _transactionRepository = transactionRepository;
-            _applicationRepository = applicationRepository;
-            _bankRepository = bankRepository;
             _applicationBankRepository = applicationBankRepository;
-
         }
 
         public async Task<VerifyTransactionResponseModel> VerifyTransaction(Transaction transaction)
         {
             _logger.LogError("Verify Mellat");
-            VerifyTransactionResponseModel verifyTransactionResult = new VerifyTransactionResponseModel();
+            var verifyTransactionResult = new VerifyTransactionResponseModel();
 
-            var applicationBank = await _applicationBankRepository.GetFirstBy(x => x.ApplicationId == transaction.ApplicationId && x.BankId == transaction.BankId);
-            string TerminalId = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatTerminalId").ParamValue;
-            string UserName = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatUserName").ParamValue;
-            string Password = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatPassword").ParamValue;
+            var applicationBank = await _applicationBankRepository.GetFirstBy(x =>
+                x.ApplicationId == transaction.ApplicationId && x.BankId == transaction.BankId);
+            var terminalId = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatTerminalId")
+                ?.ParamValue;
+            var userName = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatUserName")
+                ?.ParamValue;
+            var password = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatPassword")
+                ?.ParamValue;
 
             var trans = await _transactionRepository.GetFirstBy(x => x.Id == transaction.Id);
-            var SaleOrderId = Convert.ToInt64(trans.UserTrackCode);
-            var SaleReferenceId = Convert.ToInt64(trans.BankTrackCode);
+            var saleOrderId = Convert.ToInt64(trans.UserTrackCode);
+            var saleReferenceId = Convert.ToInt64(trans.BankTrackCode);
 
-            MellatGateway mellatGateway = new MellatGateway(TerminalId, UserName, Password);
-            string Result;
-            Result = (await mellatGateway.bpVerifyRequest(SaleOrderId, SaleReferenceId)).Body.@return;
-            if (!string.IsNullOrEmpty(Result))
+            var mellatGateway = new MellatGateway(terminalId, userName, password);
+            var verifyResult = (await mellatGateway.bpVerifyRequest(saleOrderId, saleReferenceId)).Body.@return;
+            var message = "تراکنش بازگشت داده شد";
+            if (!string.IsNullOrEmpty(verifyResult))
             {
-                if (Result == "0")
+                if (verifyResult == "0")
                 {
-                    string IQresult;
-                    IQresult = (await mellatGateway.bpInquiryRequest(SaleOrderId, SaleReferenceId)).Body.@return;
-                    if (IQresult == "0")
+                    var inquiryResult = (await mellatGateway.bpInquiryRequest(saleOrderId, saleReferenceId)).Body
+                        .@return;
+                    if (inquiryResult == "0")
                     {
-                        long paymentID = Convert.ToInt64(SaleOrderId);                        
                         //ViewBag.Message = "پرداخت با موفقیت انجام شد.";
                         //ViewBag.SaleReferenceId = SaleReferenceId;
                         // پرداخت نهایی
-                        string Sresult;
                         // تایید پرداخت
-                        Sresult = (await mellatGateway.bpSettleRequest(SaleOrderId, SaleReferenceId)).Body.@return;
-                        if (Sresult != null)
+                        var settleResult = (await mellatGateway.bpSettleRequest(saleOrderId, saleReferenceId)).Body
+                            .@return;
+                        if (settleResult != null)
                         {
-                            if (Sresult == "0" || Sresult == "45")
+                            if (settleResult == "0" || settleResult == "45")
                             {
                                 //تراکنش تایید و ستل شده است 
                                 _logger.LogError("Verify Done!!!!!");
 
-                                var message = "بانک صحت رسيد ديجيتالي شما را تصديق نمود. فرايند خريد تکميل گشت";
+                                message = "بانک صحت رسيد ديجيتالي شما را تصديق نمود. فرايند خريد تکميل گشت";
                                 message += "<br/>" + " شماره رسید : " + transaction.BankTrackCode;
-                                transaction.Status = (byte)TransactionStatusEnum.Success;
+                                transaction.Status = (byte) TransactionStatusEnum.Success;
                                 transaction.ModifiedOn = DateTime.Now;
                                 transaction.ModifiedBy = 1;
                                 await _transactionRepository.Update(transaction);
 
                                 verifyTransactionResult.Status = true;
-                                verifyTransactionResult.ErrorCode = (byte)ErrorCodeEnum.NoError;
+                                verifyTransactionResult.ErrorCode = (byte) ErrorCodeEnum.NoError;
                                 verifyTransactionResult.Message = message;
                                 _logger.LogError("Mellat Verify Done!");
                                 return verifyTransactionResult;
                             }
-                            else
-                            {
-                                //تراکنش تایید شده ولی ستل نشده است                                
-                                _logger.LogError("Verify Done!!!!!");
 
-                                var message = "بانک صحت رسيد ديجيتالي شما را تصديق نمود. فرايند خريد تکميل گشت";
-                                message += "<br/>" + " شماره رسید : " + transaction.BankTrackCode;
-                                transaction.Status = (byte)TransactionStatusEnum.WaitingForSettle;
-                                transaction.ModifiedOn = DateTime.Now;
-                                transaction.ModifiedBy = 1;
-                                await _transactionRepository.Update(transaction);
+                            //تراکنش تایید شده ولی ستل نشده است                                
+                            _logger.LogError("Verify Done!!!!!");
 
-                                verifyTransactionResult.Status = true;
-                                verifyTransactionResult.ErrorCode = (byte)ErrorCodeEnum.NoError;
-                                verifyTransactionResult.Message = message;
-                                _logger.LogError("Mellat Verify Done!");
-                                return verifyTransactionResult;
-                            }
+                            message = "بانک صحت رسيد ديجيتالي شما را تصديق نمود. فرايند خريد تکميل گشت";
+                            message += "<br/>" + " شماره رسید : " + transaction.BankTrackCode;
+                            transaction.Status = (byte) TransactionStatusEnum.WaitingForSettle;
+                            transaction.ModifiedOn = DateTime.Now;
+                            transaction.ModifiedBy = 1;
+                            await _transactionRepository.Update(transaction);
+
+                            verifyTransactionResult.Status = true;
+                            verifyTransactionResult.ErrorCode = (byte) ErrorCodeEnum.NoError;
+                            verifyTransactionResult.Message = message;
+                            _logger.LogError("Mellat Verify Done!");
+                            return verifyTransactionResult;
                         }
                     }
                     else
                     {
                         //string Rvresult;
                         //عملیات برگشت دادن مبلغ
-                        var result = (await mellatGateway.bpReversalRequest(SaleOrderId, SaleReferenceId)).Body.@return;
-                        var message = "تراکنش بازگشت داده شد";                        
+                        var result = (await mellatGateway.bpReversalRequest(saleOrderId, saleReferenceId)).Body.@return;
+                        message = "تراکنش بازگشت داده شد";
 
                         _logger.LogError("resultcode" + result);
-                        transaction.Status = (byte)TransactionStatusEnum.ErrorOnVerify;
+                        transaction.Status = (byte) TransactionStatusEnum.ErrorOnVerify;
                         transaction.BankErrorCode = Convert.ToInt32(result);
-                        transaction.BankErrorMessage = MellatHelper.MellatResult(result);
+                        transaction.BankErrorMessage = MellatResult(result);
                         transaction.ModifiedOn = DateTime.Now;
                         transaction.ModifiedBy = 1;
                         await _transactionRepository.Update(transaction);
 
                         verifyTransactionResult.Status = false;
-                        verifyTransactionResult.ErrorCode = (byte)ErrorCodeEnum.VerifyError;
+                        verifyTransactionResult.ErrorCode = (byte) ErrorCodeEnum.VerifyError;
                         verifyTransactionResult.Message = message;
                         _logger.LogError("Mellat Verify reverse!");
-                        return verifyTransactionResult;                       
+                        return verifyTransactionResult;
                     }
                 }
                 else
                 {
                     //ViewBag.Message = MellatHelper.MellatResult(Result);
                     //ViewBag.SaleReferenceId = "**************";                  
-                    var message = "تراکنش بازگشت داده شد";
+                    message = "تراکنش بازگشت داده شد";
 
                     _logger.LogError("errr1");
-                    transaction.Status = (byte)TransactionStatusEnum.ErrorOnVerify;
-                    transaction.BankErrorCode = (byte)ErrorCodeEnum.VerifyError;
-                    transaction.BankErrorMessage =message;
+                    transaction.Status = (byte) TransactionStatusEnum.ErrorOnVerify;
+                    transaction.BankErrorCode = (byte) ErrorCodeEnum.VerifyError;
+                    transaction.BankErrorMessage = message;
                     transaction.ModifiedOn = DateTime.Now;
                     transaction.ModifiedBy = 1;
                     await _transactionRepository.Update(transaction);
 
                     verifyTransactionResult.Status = false;
-                    verifyTransactionResult.ErrorCode = (byte)ErrorCodeEnum.VerifyError;
+                    verifyTransactionResult.ErrorCode = (byte) ErrorCodeEnum.VerifyError;
                     verifyTransactionResult.Message = message;
                     _logger.LogError("Mellat Verify error1!");
                     return verifyTransactionResult;
@@ -152,32 +145,30 @@ namespace Adin.BankPayment.Extension
             {
                 //ViewBag.Message = "شماره رسید قابل قبول نیست";
                 //ViewBag.SaleReferenceId = "**************";
-                var message = "تراکنش بازگشت داده شد";
 
-                _logger.LogError("err2" );
-                transaction.Status = (byte)TransactionStatusEnum.ErrorOnVerify;
-                transaction.BankErrorCode = (byte)ErrorCodeEnum.VerifyError;
+                _logger.LogError("err2");
+                transaction.Status = (byte) TransactionStatusEnum.ErrorOnVerify;
+                transaction.BankErrorCode = (byte) ErrorCodeEnum.VerifyError;
                 transaction.BankErrorMessage = message;
                 transaction.ModifiedOn = DateTime.Now;
                 transaction.ModifiedBy = 1;
                 await _transactionRepository.Update(transaction);
 
                 verifyTransactionResult.Status = false;
-                verifyTransactionResult.ErrorCode = (byte)ErrorCodeEnum.VerifyError;
+                verifyTransactionResult.ErrorCode = (byte) ErrorCodeEnum.VerifyError;
                 verifyTransactionResult.Message = message;
                 _logger.LogError("Mellat Verify error2!");
                 return verifyTransactionResult;
             }
 
-
             return verifyTransactionResult;
         }
 
 
-        public static string MellatResult(string ID)
+        public static string MellatResult(string id)
         {
-            string result = "";
-            switch (ID)
+            string result;
+            switch (id)
             {
                 case "-100":
                     result = "پرداخت لغو شده";
@@ -321,14 +312,14 @@ namespace Adin.BankPayment.Extension
                     result = string.Empty;
                     break;
             }
+
             return result;
         }
 
 
-        public static ErrorCodeEnum ErrorResult(string ID)
+        public static ErrorCodeEnum ErrorResult(string id)
         {
-            ErrorCodeEnum bankErrorCodeEnum = ErrorCodeEnum.UnkownError;
-            switch (ID)
+            switch (id)
             {
                 case "-100":
 
@@ -555,12 +546,9 @@ namespace Adin.BankPayment.Extension
                 //break;
                 default:
                     return ErrorCodeEnum.UnkownError;
-                    //result = string.Empty;
-                    //break;
+                //result = string.Empty;
+                //break;
             }
-            return ErrorCodeEnum.UnkownError;
         }
-
-
     }
 }

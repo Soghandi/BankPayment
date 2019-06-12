@@ -1,19 +1,20 @@
-﻿using Adin.BankPayment.Domain.Context;
-using Adin.BankPayment.Domain.Model;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Adin.BankPayment.Domain.Context;
+using Adin.BankPayment.Domain.Model;
+using Microsoft.EntityFrameworkCore;
 using Z.EntityFramework.Plus;
 
 namespace Adin.BankPayment.Service
 {
     public class BankRepository : IRepository<Bank>
     {
-        private BankPaymentContext context;
-        private DbSet<Bank> entity;
+        private readonly BankPaymentContext context;
+        private readonly DbSet<Bank> entity;
+
         public BankRepository(BankPaymentContext context)
         {
             this.context = context;
@@ -47,10 +48,12 @@ namespace Adin.BankPayment.Service
             obj.IsDeleted = true;
             await Update(obj);
         }
+
         public async Task<IEnumerable<Bank>> GetAllBy(Expression<Func<Bank, bool>> predicate)
         {
             return await entity.Where(predicate).ToListAsync();
         }
+
         public async Task<Bank> GetFirstBy(Expression<Func<Bank, bool>> predicate)
         {
             return await entity.Where(predicate).FirstOrDefaultAsync();

@@ -1,25 +1,28 @@
-﻿using Adin.BankPayment.Connector.Model;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Adin.BankPayment.Connector.Enum;
+using Adin.BankPayment.Connector.Model;
+using Newtonsoft.Json;
 
 namespace Adin.BankPayment.Connector
 {
     public class ClientService
     {
+        private readonly string _baseUrl;
+        private readonly string _publicKey;
+        private string _token;
+        private DateTime _tokenExpiration;
+
         public ClientService(string baseUrl, string publicKey)
         {
             _baseUrl = baseUrl;
             _publicKey = publicKey;
         }
-        private string _baseUrl;
-        private string _publicKey;
-        private string _token;
-        private DateTime _tokenExpiration;
 
         private async Task FillToken()
         {
@@ -28,12 +31,11 @@ namespace Adin.BankPayment.Connector
                 client.DefaultRequestHeaders.Accept
                     .Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                var dict = new Dictionary<string, string>();
-                dict.Add("publicKey", _publicKey);
+                var dict = new Dictionary<string, string> {{"publicKey", _publicKey}};
 
-                var pUrl = new Uri(string.Format("{0}/api/token", _baseUrl));
+                var pUrl = new Uri($"{_baseUrl}/api/token");
 
-                var req = new HttpRequestMessage(HttpMethod.Post, pUrl) { Content = new FormUrlEncodedContent(dict) };
+                var req = new HttpRequestMessage(HttpMethod.Post, pUrl) {Content = new FormUrlEncodedContent(dict)};
                 var response = await client.SendAsync(req);
                 if (response.IsSuccessStatusCode)
                 {
@@ -52,14 +54,14 @@ namespace Adin.BankPayment.Connector
             {
                 client.BaseAddress = new Uri(_baseUrl);
                 client.DefaultRequestHeaders
-                      .Accept
-                      .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    .Accept
+                    .Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
-                string serializedModel = JsonConvert.SerializeObject(model);
+                var serializedModel = JsonConvert.SerializeObject(model);
                 var content = new StringContent(serializedModel,
-                                                    Encoding.UTF8,
-                                                    "application/json");
+                    Encoding.UTF8,
+                    "application/json");
 
                 var response = await client.PostAsync("/api/PayInfo/RequestPay", content);
                 if (response.IsSuccessStatusCode)
@@ -68,25 +70,20 @@ namespace Adin.BankPayment.Connector
                     var resModel = JsonConvert.DeserializeObject<PayRequestResponseModel>(res);
                     return new OutputModel<PayRequestResponseModel>
                     {
-
                         Body = resModel,
-                        Status = Enum.ApiStatusCodeEnum.Success
+                        Status = ApiStatusCodeEnum.Success
                     };
                 }
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                {
+
+                if (response.StatusCode == HttpStatusCode.Unauthorized)
                     return new OutputModel<PayRequestResponseModel>
                     {
-                        Status = Enum.ApiStatusCodeEnum.InvalidPublicKey
+                        Status = ApiStatusCodeEnum.InvalidPublicKey
                     };
-                }
-                else
+                return new OutputModel<PayRequestResponseModel>
                 {
-                    return new OutputModel<PayRequestResponseModel>
-                    {
-                        Status = Enum.ApiStatusCodeEnum.BadRequest
-                    };
-                }
+                    Status = ApiStatusCodeEnum.BadRequest
+                };
             }
         }
 
@@ -96,10 +93,10 @@ namespace Adin.BankPayment.Connector
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders
-                      .Accept
-                      .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    .Accept
+                    .Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-                var pUrl = new Uri(string.Format("{0}/api/PayInfo/Verify?id={1}", _baseUrl, id));
+                var pUrl = new Uri($"{_baseUrl}/api/PayInfo/Verify?id={id}");
                 var response = await client.GetAsync(pUrl);
                 if (response.IsSuccessStatusCode)
                 {
@@ -107,34 +104,28 @@ namespace Adin.BankPayment.Connector
                     var resModel = JsonConvert.DeserializeObject<VerifyTransactionResponseModel>(res);
                     return new OutputModel<VerifyTransactionResponseModel>
                     {
-
                         Body = resModel,
-                        Status = Enum.ApiStatusCodeEnum.Success
+                        Status = ApiStatusCodeEnum.Success
                     };
                 }
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                {
-                    return new OutputModel<VerifyTransactionResponseModel>
-                    {
-                        Status = Enum.ApiStatusCodeEnum.InvalidPublicKey,
-                        Body = new VerifyTransactionResponseModel
-                        {
-                            Message = "عملیات با خطا مواجه شد"
-                        }
 
-                    };
-                }
-                else
-                {
+                if (response.StatusCode == HttpStatusCode.Unauthorized)
                     return new OutputModel<VerifyTransactionResponseModel>
                     {
-                        Status = Enum.ApiStatusCodeEnum.BadRequest,
+                        Status = ApiStatusCodeEnum.InvalidPublicKey,
                         Body = new VerifyTransactionResponseModel
                         {
-                            Message = "عملیات با خطا مواجه شد"
+                            Message = "Unauthorized - عملیات با خطا مواجه شد"
                         }
                     };
-                }
+                return new OutputModel<VerifyTransactionResponseModel>
+                {
+                    Status = ApiStatusCodeEnum.BadRequest,
+                    Body = new VerifyTransactionResponseModel
+                    {
+                        Message = "عملیات با خطا مواجه شد"
+                    }
+                };
             }
         }
 
@@ -144,48 +135,42 @@ namespace Adin.BankPayment.Connector
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders
-                      .Accept
-                      .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    .Accept
+                    .Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
-                var pUrl = new Uri(string.Format("{0}/api/PayInfo/CancelPayment?id={1}", _baseUrl, id));
+                var pUrl = new Uri($"{_baseUrl}/api/PayInfo/CancelPayment?id={id}");
                 var response = await client.GetAsync(pUrl);
                 if (response.IsSuccessStatusCode)
                 {
-
                     var res = await response.Content.ReadAsStringAsync();
                     var resModel = JsonConvert.DeserializeObject<CancelPaymentResponseModel>(res);
                     return new OutputModel<CancelPaymentResponseModel>
                     {
-
                         Body = resModel,
-                        Status = Enum.ApiStatusCodeEnum.Success
+                        Status = ApiStatusCodeEnum.Success
                     };
                 }
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                {
+
+                if (response.StatusCode == HttpStatusCode.Unauthorized)
                     return new OutputModel<CancelPaymentResponseModel>
                     {
-                        Status = Enum.ApiStatusCodeEnum.InvalidPublicKey,
+                        Status = ApiStatusCodeEnum.InvalidPublicKey,
                         Body = new CancelPaymentResponseModel
                         {
                             Message = "عملیات با خطا مواجه شد"
                         }
-
                     };
-                }
-                else
+
                 {
                     var res = await response.Content.ReadAsStringAsync();
                     var resModel = JsonConvert.DeserializeObject<CancelPaymentResponseModel>(res);
                     return new OutputModel<CancelPaymentResponseModel>
                     {
-                        Status = Enum.ApiStatusCodeEnum.BadRequest,
+                        Status = ApiStatusCodeEnum.BadRequest,
                         Body = resModel
                     };
                 }
             }
         }
-
-
     }
 }

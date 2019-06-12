@@ -1,15 +1,12 @@
-﻿using Adin.BankPayment.Domain.Cache;
+﻿using System;
+using Adin.BankPayment.Domain.Cache;
 using Adin.BankPayment.Domain.Model;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace Adin.BankPayment.Domain.Context
 {
     public class BankPaymentContext : DbContext
     {
-
         public BankPaymentContext(DbContextOptions<BankPaymentContext> options) : base(options)
         {
             Init();
@@ -19,10 +16,22 @@ namespace Adin.BankPayment.Domain.Context
         {
             Init();
         }
+
+        public DbSet<Application> Applications { get; set; }
+
+        public DbSet<Transaction> Transactions { get; set; }
+
+        public DbSet<Bank> Banks { get; set; }
+
+        public DbSet<ApplicationBank> ApplicationBanks { get; set; }
+
+        public DbSet<ApplicationBankParam> ApplicationBankParams { get; set; }
+
         protected internal virtual void Init()
         {
             //  this.InitializeDynamicFilters();
         }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(ConnectionStringGetter.ConStr);
@@ -68,35 +77,17 @@ namespace Adin.BankPayment.Domain.Context
                     Id = Guid.Parse("ab3f226a-be56-4092-bbd0-2ae8ffbce131"),
                     Status = 0
                 },
-            new Bank
-            {
-                Code = 3,
-                CreatedBy = 1,
-                CreationDate = DateTime.Now,
-                IsDeleted = false,
-                PostUrl = "https://bpm.shaparak.ir/pgwchannel/startpay.mellat",
-                Title = "ملت",
-                Id = Guid.Parse("98504148-3d89-4abb-9fb5-281bed8714e3"),
-                Status = 0
-            });
-    
-
+                new Bank
+                {
+                    Code = 3,
+                    CreatedBy = 1,
+                    CreationDate = DateTime.Now,
+                    IsDeleted = false,
+                    PostUrl = "https://bpm.shaparak.ir/pgwchannel/startpay.mellat",
+                    Title = "ملت",
+                    Id = Guid.Parse("98504148-3d89-4abb-9fb5-281bed8714e3"),
+                    Status = 0
+                });
         }
-
-        public DbSet<Application> Applications { get; set; }
-
-        public DbSet<Transaction> Transactions { get; set; }
-
-        public DbSet<Bank> Banks { get; set; }
-
-        public DbSet<ApplicationBank> ApplicationBanks { get; set; }
-
-        public DbSet<ApplicationBankParam> ApplicationBankParams { get; set; }
-
-
     }
-
-
-
 }
-

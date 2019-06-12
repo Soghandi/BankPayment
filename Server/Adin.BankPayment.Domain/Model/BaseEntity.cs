@@ -1,15 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Adin.BankPayment.Domain.Model
 {
-    public class BaseEntity 
+    public class BaseEntity
     {
-        [Key]
-        public Guid Id { get; set; }
+        [Key] public Guid Id { get; set; }
 
         public byte Status { get; set; }
 
@@ -21,8 +17,7 @@ namespace Adin.BankPayment.Domain.Model
 
         public int? ModifiedBy { get; set; }
 
-        [Timestamp]
-        public byte[] RowVersion { get; set; }
+        [Timestamp] public byte[] RowVersion { get; set; }
 
         public bool IsDeleted { get; set; }
     }

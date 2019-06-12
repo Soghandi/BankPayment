@@ -1,19 +1,20 @@
-﻿using Adin.BankPayment.Domain.Context;
-using Adin.BankPayment.Domain.Model;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Adin.BankPayment.Domain.Context;
+using Adin.BankPayment.Domain.Model;
+using Microsoft.EntityFrameworkCore;
 using Z.EntityFramework.Plus;
 
 namespace Adin.BankPayment.Service
 {
     public class TransactionRepository : IRepository<Transaction>
     {
-        private BankPaymentContext context;
-        private DbSet<Transaction> entity;
+        private readonly BankPaymentContext context;
+        private readonly DbSet<Transaction> entity;
+
         public TransactionRepository(BankPaymentContext context)
         {
             this.context = context;
@@ -43,20 +44,21 @@ namespace Adin.BankPayment.Service
 
         public async Task Delete(Guid id)
         {
-            Transaction transaction = await Get(id);
+            var transaction = await Get(id);
             transaction.IsDeleted = true;
             await Update(transaction);
         }
 
         public async Task DeletePermanently(Guid id)
         {
-            await entity.Where(x => x.Id == id).DeleteAsync();           
+            await entity.Where(x => x.Id == id).DeleteAsync();
         }
 
         public async Task<IEnumerable<Transaction>> GetAllBy(Expression<Func<Transaction, bool>> predicate)
         {
             return await entity.Where(predicate).ToListAsync();
         }
+
         public async Task<Transaction> GetFirstBy(Expression<Func<Transaction, bool>> predicate)
         {
             return await entity.Where(predicate).FirstOrDefaultAsync();

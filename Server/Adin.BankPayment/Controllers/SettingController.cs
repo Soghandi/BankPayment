@@ -1,35 +1,36 @@
 ﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Adin.BankPayment.Service;
-using Adin.BankPayment.Domain.Model;
 using System.Linq;
+using System.Threading.Tasks;
+using Adin.BankPayment.Connector.Enum;
+using Adin.BankPayment.Domain.Enum;
+using Adin.BankPayment.Domain.Model;
+using Adin.BankPayment.Service;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
 namespace Adin.BankPayment.Controllers
 {
     [Route("api/[controller]/[action]")]
     public class SettingController : BaseController
     {
-
+        private readonly IRepository<ApplicationBankParam> _applicationBankParamRepository;
+        private readonly IRepository<ApplicationBank> _applicationBankRepository;
+        private readonly IRepository<Application> _applicationRepository;
+        private readonly IRepository<Bank> _bankRepository;
         private readonly ILogger<SettingController> _logger;
         private IRepository<Transaction> _transactionRepository;
-        private IRepository<Application> _applicationRepository;
-        private IRepository<Bank> _bankRepository;
-        private IRepository<ApplicationBank> _applicationBankRepository;
-        private IRepository<ApplicationBankParam> _applicationBankParamRepository;
 
         public SettingController(IMemoryCache memCaches,
-                             ILogger<SettingController> logger,
-                             IRepository<Transaction> transactionRepository,
-                             IRepository<Application> applicationRepository,
-                             IRepository<Bank> bankRepository,
-                             IRepository<ApplicationBank> applicationBankRepository,
-                             IRepository<ApplicationBankParam> applicationBankParamRepository) : base(memCaches, logger, applicationRepository)
+            ILogger<SettingController> logger,
+            IRepository<Transaction> transactionRepository,
+            IRepository<Application> applicationRepository,
+            IRepository<Bank> bankRepository,
+            IRepository<ApplicationBank> applicationBankRepository,
+            IRepository<ApplicationBankParam> applicationBankParamRepository) : base(memCaches, logger,
+            applicationRepository)
         {
-
             _logger = logger;
             _transactionRepository = transactionRepository;
             _applicationRepository = applicationRepository;
@@ -37,31 +38,27 @@ namespace Adin.BankPayment.Controllers
             _applicationBankRepository = applicationBankRepository;
             _applicationBankParamRepository = applicationBankParamRepository;
         }
+
         [HttpPost]
         public async Task<IActionResult> AddApplication(string title, string publickey, string description)
         {
             try
             {
-                Application app = await _applicationRepository.GetFirstBy(x => x.Title == title);
-                if (app != null)
-                {
-                    return BadRequest("اپلیکیشنی با همین نام از قبل وجود دارد");
-                }
+                var app = await _applicationRepository.GetFirstBy(x => x.Title == title);
+                if (app != null) return BadRequest("اپلیکیشنی با همین نام از قبل وجود دارد");
 
                 if (publickey == null || publickey.Length < 16)
-                {
                     return BadRequest("طول کلید باید بیشتر از 16 کاراکتر باشد");
-                }
-                Application application = new Application
+                var application = new Application
                 {
                     IsDeleted = false,
-                    Status = (byte)Domain.Enum.ApplicationEnum.Normal,
+                    Status = (byte) ApplicationEnum.Normal,
                     Title = title,
                     CreatedBy = 1,
                     CreationDate = DateTime.Now,
                     PublicKey = publickey,
                     PrivateKey = null,
-                    Description = description,
+                    Description = description
                 };
                 await _applicationRepository.Add(application);
                 return Ok();
@@ -79,13 +76,12 @@ namespace Adin.BankPayment.Controllers
         {
             try
             {
-                Application application = await _applicationRepository.GetFirstBy(x => x.PublicKey == publicKey);
-                if (application == null)
-                {
-                    return Unauthorized();
-                }
-                var bank = await _bankRepository.GetFirstBy(x => x.Code == (byte)Connector.Enum.BankCodeEnum.Saman);
-                var applicationBank = await _applicationBankRepository.GetFirstBy(x => x.ApplicationId == application.Id && x.BankId == bank.Id);
+                var application = await _applicationRepository.GetFirstBy(x => x.PublicKey == publicKey);
+                if (application == null) return Unauthorized();
+                var bank = await _bankRepository.GetFirstBy(x => x.Code == (byte) BankCodeEnum.Saman);
+                var applicationBank =
+                    await _applicationBankRepository.GetFirstBy(x =>
+                        x.ApplicationId == application.Id && x.BankId == bank.Id);
 
                 if (applicationBank == null)
                 {
@@ -98,7 +94,7 @@ namespace Adin.BankPayment.Controllers
                         CreationDate = DateTime.Now
                     };
                     await _applicationBankRepository.Add(applicationBank);
-                    ApplicationBankParam applicationBankParam = new ApplicationBankParam();
+                    var applicationBankParam = new ApplicationBankParam();
                     applicationBankParam.CreatedBy = 1;
                     applicationBankParam.CreationDate = DateTime.Now;
                     applicationBankParam.ParamKey = "MID";
@@ -108,13 +104,11 @@ namespace Adin.BankPayment.Controllers
                     await _applicationBankParamRepository.Add(applicationBankParam);
                     return Ok();
                 }
-                else
-                {
-                    var midParam = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MID");
-                    midParam.ParamValue = MID;
-                    await _applicationBankRepository.Update(applicationBank);
-                    return Ok();
-                }
+
+                var midParam = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MID");
+                midParam.ParamValue = MID;
+                await _applicationBankRepository.Update(applicationBank);
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -128,13 +122,12 @@ namespace Adin.BankPayment.Controllers
         {
             try
             {
-                Application application = await _applicationRepository.GetFirstBy(x => x.PublicKey == publicKey);
-                if (application == null)
-                {
-                    return Unauthorized();
-                }
-                var bank = await _bankRepository.GetFirstBy(x => x.Code == (byte)Connector.Enum.BankCodeEnum.Parsian);
-                var applicationBank = await _applicationBankRepository.GetFirstBy(x => x.ApplicationId == application.Id && x.BankId == bank.Id);
+                var application = await _applicationRepository.GetFirstBy(x => x.PublicKey == publicKey);
+                if (application == null) return Unauthorized();
+                var bank = await _bankRepository.GetFirstBy(x => x.Code == (byte) BankCodeEnum.Parsian);
+                var applicationBank =
+                    await _applicationBankRepository.GetFirstBy(x =>
+                        x.ApplicationId == application.Id && x.BankId == bank.Id);
 
                 if (applicationBank == null)
                 {
@@ -147,7 +140,7 @@ namespace Adin.BankPayment.Controllers
                         CreationDate = DateTime.Now
                     };
                     await _applicationBankRepository.Add(applicationBank);
-                    ApplicationBankParam applicationBankParam = new ApplicationBankParam();
+                    var applicationBankParam = new ApplicationBankParam();
                     applicationBankParam.CreatedBy = 1;
                     applicationBankParam.CreationDate = DateTime.Now;
                     applicationBankParam.ParamKey = "ParsianPIN";
@@ -157,13 +150,11 @@ namespace Adin.BankPayment.Controllers
                     await _applicationBankParamRepository.Add(applicationBankParam);
                     return Ok();
                 }
-                else
-                {
-                    var midParam = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "ParsianPIN");
-                    midParam.ParamValue = Pin;
-                    await _applicationBankRepository.Update(applicationBank);
-                    return Ok();
-                }
+
+                var midParam = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "ParsianPIN");
+                midParam.ParamValue = Pin;
+                await _applicationBankRepository.Update(applicationBank);
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -173,17 +164,17 @@ namespace Adin.BankPayment.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SetMellatParams(string publicKey, string terminalId, string userName, string password)
+        public async Task<IActionResult> SetMellatParams(string publicKey, string terminalId, string userName,
+            string password)
         {
             try
             {
-                Application application = await _applicationRepository.GetFirstBy(x => x.PublicKey == publicKey);
-                if (application == null)
-                {
-                    return Unauthorized();
-                }
-                var bank = await _bankRepository.GetFirstBy(x => x.Code == (byte)Connector.Enum.BankCodeEnum.Mellat);
-                var applicationBank = await _applicationBankRepository.GetFirstBy(x => x.ApplicationId == application.Id && x.BankId == bank.Id);
+                var application = await _applicationRepository.GetFirstBy(x => x.PublicKey == publicKey);
+                if (application == null) return Unauthorized();
+                var bank = await _bankRepository.GetFirstBy(x => x.Code == (byte) BankCodeEnum.Mellat);
+                var applicationBank =
+                    await _applicationBankRepository.GetFirstBy(x =>
+                        x.ApplicationId == application.Id && x.BankId == bank.Id);
 
                 if (applicationBank == null)
                 {
@@ -196,7 +187,7 @@ namespace Adin.BankPayment.Controllers
                         CreationDate = DateTime.Now
                     };
                     await _applicationBankRepository.Add(applicationBank);
-                    ApplicationBankParam terminalBankParam = new ApplicationBankParam();
+                    var terminalBankParam = new ApplicationBankParam();
                     terminalBankParam.CreatedBy = 1;
                     terminalBankParam.CreationDate = DateTime.Now;
                     terminalBankParam.ParamKey = "MellatTerminalId";
@@ -205,7 +196,7 @@ namespace Adin.BankPayment.Controllers
                     terminalBankParam.ApplicationBankId = applicationBank.Id;
                     await _applicationBankParamRepository.Add(terminalBankParam);
 
-                    ApplicationBankParam userNameBankParam = new ApplicationBankParam();
+                    var userNameBankParam = new ApplicationBankParam();
                     userNameBankParam.CreatedBy = 1;
                     userNameBankParam.CreationDate = DateTime.Now;
                     userNameBankParam.ParamKey = "MellatUserName";
@@ -214,7 +205,7 @@ namespace Adin.BankPayment.Controllers
                     userNameBankParam.ApplicationBankId = applicationBank.Id;
                     await _applicationBankParamRepository.Add(userNameBankParam);
 
-                    ApplicationBankParam passwordBankParam = new ApplicationBankParam();
+                    var passwordBankParam = new ApplicationBankParam();
                     passwordBankParam.CreatedBy = 1;
                     passwordBankParam.CreationDate = DateTime.Now;
                     passwordBankParam.ParamKey = "MellatPassword";
@@ -224,21 +215,22 @@ namespace Adin.BankPayment.Controllers
                     await _applicationBankParamRepository.Add(passwordBankParam);
                     return Ok();
                 }
-                else
-                {
-                    var midParam = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatTerminalId");
-                    midParam.ParamValue = terminalId;
-                    await _applicationBankRepository.Update(applicationBank);
 
-                    var userNameParam = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatUserName");
-                    userNameParam.ParamValue = userName;
-                    await _applicationBankRepository.Update(applicationBank);
+                var midParam =
+                    applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatTerminalId");
+                midParam.ParamValue = terminalId;
+                await _applicationBankRepository.Update(applicationBank);
 
-                    var passwordParam = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatPassword");
-                    passwordParam.ParamValue = password;
-                    await _applicationBankRepository.Update(applicationBank);
-                    return Ok();
-                }
+                var userNameParam =
+                    applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatUserName");
+                userNameParam.ParamValue = userName;
+                await _applicationBankRepository.Update(applicationBank);
+
+                var passwordParam =
+                    applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatPassword");
+                passwordParam.ParamValue = password;
+                await _applicationBankRepository.Update(applicationBank);
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -254,8 +246,5 @@ namespace Adin.BankPayment.Controllers
             var app = await GetApplicationAsync();
             return Ok(app.Title);
         }
-
     }
 }
-
-

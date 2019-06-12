@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Adin.BankPayment.Connector.Enum
+﻿namespace Adin.BankPayment.Connector.Enum
 {
     public enum ApiStatusCodeEnum
     {
@@ -10,6 +6,6 @@ namespace Adin.BankPayment.Connector.Enum
 
         InvalidPublicKey = 1,
 
-        BadRequest = 2,
+        BadRequest = 2
     }
 }

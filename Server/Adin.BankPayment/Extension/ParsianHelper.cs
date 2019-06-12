@@ -1,16 +1,14 @@
-﻿
+﻿using System.Threading.Tasks;
 using Adin.BankPayment.Connector.Model;
 using Adin.BankPayment.Domain.Model;
-using System.Threading.Tasks;
 
 namespace Adin.BankPayment.Extension
 {
-
-    public class ParsianHelper : BankHelper
+    public class ParsianHelper : IBankHelper
     {
         public async Task<VerifyTransactionResponseModel> VerifyTransaction(Transaction transaction)
         {
-            VerifyTransactionResponseModel verifyTransactionResult = new VerifyTransactionResponseModel();
+            var verifyTransactionResult = new VerifyTransactionResponseModel();
 
             return verifyTransactionResult;
         }

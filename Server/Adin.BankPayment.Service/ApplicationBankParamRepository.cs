@@ -1,20 +1,20 @@
-﻿using Adin.BankPayment.Domain.Context;
-using Adin.BankPayment.Domain.Model;
-using Adin.BankPayment.Service;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Adin.BankPayment.Domain.Context;
+using Adin.BankPayment.Domain.Model;
+using Microsoft.EntityFrameworkCore;
 using Z.EntityFramework.Plus;
 
 namespace Adin.BankPayment.Service
 {
     public class ApplicationBankParamRepository : IRepository<ApplicationBankParam>
     {
-        private BankPaymentContext context;
-        private DbSet<ApplicationBankParam> entity;
+        private readonly BankPaymentContext context;
+        private readonly DbSet<ApplicationBankParam> entity;
+
         public ApplicationBankParamRepository(BankPaymentContext context)
         {
             this.context = context;
@@ -24,11 +24,6 @@ namespace Adin.BankPayment.Service
         public async Task<ApplicationBankParam> Get(Guid id)
         {
             return await entity.FirstOrDefaultAsync(x => x.Id == id);
-        }
-
-        public async Task<List<ApplicationBankParam>> GetByApplicationBank(Guid id)
-        {
-            return await entity.Where(x => x.ApplicationBankId == id).ToListAsync();
         }
 
         public async Task<IEnumerable<ApplicationBankParam>> GetAll()
@@ -53,10 +48,13 @@ namespace Adin.BankPayment.Service
             obj.IsDeleted = true;
             await Update(obj);
         }
-        public async Task<IEnumerable<ApplicationBankParam>> GetAllBy(Expression<Func<ApplicationBankParam, bool>> predicate)
+
+        public async Task<IEnumerable<ApplicationBankParam>> GetAllBy(
+            Expression<Func<ApplicationBankParam, bool>> predicate)
         {
             return await entity.Where(predicate).ToListAsync();
         }
+
         public async Task<ApplicationBankParam> GetFirstBy(Expression<Func<ApplicationBankParam, bool>> predicate)
         {
             return await entity.Where(predicate).FirstOrDefaultAsync();
@@ -64,7 +62,12 @@ namespace Adin.BankPayment.Service
 
         public async Task DeletePermanently(Guid id)
         {
-            await entity.Where(x => x.Id == id).DeleteAsync();                     
+            await entity.Where(x => x.Id == id).DeleteAsync();
+        }
+
+        public async Task<List<ApplicationBankParam>> GetByApplicationBank(Guid id)
+        {
+            return await entity.Where(x => x.ApplicationBankId == id).ToListAsync();
         }
     }
 }

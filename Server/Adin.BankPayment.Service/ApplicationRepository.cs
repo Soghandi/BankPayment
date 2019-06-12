@@ -1,21 +1,20 @@
-﻿using Adin.BankPayment.Domain.Context;
-using Adin.BankPayment.Domain.Enum;
-using Adin.BankPayment.Domain.Model;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
+using Adin.BankPayment.Domain.Context;
+using Adin.BankPayment.Domain.Model;
+using Microsoft.EntityFrameworkCore;
 using Z.EntityFramework.Plus;
 
 namespace Adin.BankPayment.Service
 {
     public class ApplicationRepository : IRepository<Application>
     {
-        private BankPaymentContext context;
-        private DbSet<Application> entity;
+        private readonly BankPaymentContext context;
+        private readonly DbSet<Application> entity;
+
         public ApplicationRepository(BankPaymentContext context)
         {
             this.context = context;
@@ -25,11 +24,6 @@ namespace Adin.BankPayment.Service
         public async Task<Application> Get(Guid id)
         {
             return await entity.FirstOrDefaultAsync(x => x.Id == id);
-        }
-
-        public async Task<Application> GetByPublicKey(string publicKey)
-        {
-            return await entity.FirstOrDefaultAsync(x => x.PublicKey == publicKey);
         }
 
         public async Task<IEnumerable<Application>> GetAll()
@@ -52,7 +46,7 @@ namespace Adin.BankPayment.Service
         {
             var obj = await Get(id);
             obj.IsDeleted = true;
-            await Update(obj);          
+            await Update(obj);
         }
 
         public async Task<IEnumerable<Application>> GetAllBy(Expression<Func<Application, bool>> predicate)
@@ -68,6 +62,11 @@ namespace Adin.BankPayment.Service
         public async Task DeletePermanently(Guid id)
         {
             await entity.Where(x => x.Id == id).DeleteAsync();
+        }
+
+        public async Task<Application> GetByPublicKey(string publicKey)
+        {
+            return await entity.FirstOrDefaultAsync(x => x.PublicKey == publicKey);
         }
     }
 }

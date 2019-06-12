@@ -16,7 +16,9 @@ namespace Adin.BankPayment.ClientSample
         }
 
         public IConfiguration Configuration { get; }
+
         public string _paymentKey { get; set; }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -51,8 +53,8 @@ namespace Adin.BankPayment.ClientSample
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    "default",
+                    "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }
