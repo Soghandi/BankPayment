@@ -26,7 +26,7 @@ namespace Adin.BankPayment.Controllers
             IRepository<Transaction> transactionRepository,
             IRepository<Application> applicationRepository,
             IRepository<Bank> bankRepository,
-            IRepository<ApplicationBank> applicationBankRepository) : base(memCaches, logger, applicationRepository)
+            IRepository<ApplicationBank> applicationBankRepository) : base(memCaches, applicationRepository)
         {
             _logger = logger;
             _transactionRepository = transactionRepository;
@@ -43,9 +43,14 @@ namespace Adin.BankPayment.Controllers
             {
                 var application = await GetApplicationAsync();
                 if (application == null || application.Status != 0) return Unauthorized();
-                if (model.PriceUnit == PriceUnitEnum.Toman) model.Amount = model.Amount * 10;
-                if (model.PriceUnit == PriceUnitEnum.Dollar)
-                    throw new NotImplementedException("Dollar not supported yet");
+                switch (model.PriceUnit)
+                {
+                    case PriceUnitEnum.Toman:
+                        model.Amount *= 10;
+                        break;
+                    case PriceUnitEnum.Dollar:
+                        throw new NotImplementedException("Dollar not supported yet");
+                }
 
                 //Todo: Find Best Bank For User
                 var bank = await _bankRepository.GetFirstBy(x => x.Code == (byte) model.BankCode);
@@ -64,17 +69,13 @@ namespace Adin.BankPayment.Controllers
                 };
                 await _transactionRepository.Add(transaction);
 
-                var applicationBank =
-                    await _applicationBankRepository.GetFirstBy(x =>
-                        x.ApplicationId == application.Id && x.BankId == bank.Id);
-
-                var currentBaseUrl = string.Format("{0}://{1}", Request.Scheme, Request.Host);
+                var currentBaseUrl = $"{Request.Scheme}://{Request.Host}";
 
                 switch (model.BankCode)
                 {
                     case BankCodeEnum.Parsian:
-                        var parsianRedirectUrl = string.Format("{0}/Parsian/Callback?token={1}&SecondTrackCode={2}",
-                            currentBaseUrl, model.TrackCode, transaction.Id);
+                        var parsianRedirectUrl =
+                            $"{currentBaseUrl}/Parsian/Callback?token={model.TrackCode}&SecondTrackCode={transaction.Id}";
                         transaction.BankRedirectUrl = parsianRedirectUrl;
                         await _transactionRepository.Update(transaction);
                         return Ok(
@@ -85,8 +86,8 @@ namespace Adin.BankPayment.Controllers
                             });
 
                     case BankCodeEnum.Mellat:
-                        var mellatRedirectUrl = string.Format("{0}/Mellat/Callback?token={1}&SecondTrackCode={2}",
-                            currentBaseUrl, model.TrackCode, transaction.Id);
+                        var mellatRedirectUrl =
+                            $"{currentBaseUrl}/Mellat/Callback?token={model.TrackCode}&SecondTrackCode={transaction.Id}";
                         transaction.BankRedirectUrl = mellatRedirectUrl;
                         await _transactionRepository.Update(transaction);
                         return Ok(
@@ -97,8 +98,8 @@ namespace Adin.BankPayment.Controllers
                             });
                     case BankCodeEnum.Saman:
                     default:
-                        var redirectUrl = string.Format("{0}/Saman/Callback?token={1}&SecondTrackCode={2}",
-                            currentBaseUrl, model.TrackCode, transaction.Id);
+                        var redirectUrl =
+                            $"{currentBaseUrl}/Saman/Callback?token={model.TrackCode}&SecondTrackCode={transaction.Id}";
                         transaction.BankRedirectUrl = redirectUrl;
                         await _transactionRepository.Update(transaction);
                         return Ok(

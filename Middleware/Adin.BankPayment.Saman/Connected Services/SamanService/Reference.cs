@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SamanService
+namespace Adin.BankPayment.Saman.Connected_Services.SamanService
 {
     
     

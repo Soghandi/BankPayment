@@ -20,19 +20,15 @@ namespace Adin.BankPayment.Controllers
         private readonly IRepository<Application> _applicationRepository;
         private readonly IRepository<Bank> _bankRepository;
         private readonly ILogger<SettingController> _logger;
-        private IRepository<Transaction> _transactionRepository;
 
         public SettingController(IMemoryCache memCaches,
             ILogger<SettingController> logger,
-            IRepository<Transaction> transactionRepository,
             IRepository<Application> applicationRepository,
             IRepository<Bank> bankRepository,
             IRepository<ApplicationBank> applicationBankRepository,
-            IRepository<ApplicationBankParam> applicationBankParamRepository) : base(memCaches, logger,
-            applicationRepository)
+            IRepository<ApplicationBankParam> applicationBankParamRepository) : base(memCaches, applicationRepository)
         {
             _logger = logger;
-            _transactionRepository = transactionRepository;
             _applicationRepository = applicationRepository;
             _bankRepository = bankRepository;
             _applicationBankRepository = applicationBankRepository;
@@ -187,31 +183,37 @@ namespace Adin.BankPayment.Controllers
                         CreationDate = DateTime.Now
                     };
                     await _applicationBankRepository.Add(applicationBank);
-                    var terminalBankParam = new ApplicationBankParam();
-                    terminalBankParam.CreatedBy = 1;
-                    terminalBankParam.CreationDate = DateTime.Now;
-                    terminalBankParam.ParamKey = "MellatTerminalId";
-                    terminalBankParam.ParamValue = terminalId;
-                    terminalBankParam.Status = 0;
-                    terminalBankParam.ApplicationBankId = applicationBank.Id;
+                    var terminalBankParam = new ApplicationBankParam
+                    {
+                        CreatedBy = 1,
+                        CreationDate = DateTime.Now,
+                        ParamKey = "MellatTerminalId",
+                        ParamValue = terminalId,
+                        Status = 0,
+                        ApplicationBankId = applicationBank.Id
+                    };
                     await _applicationBankParamRepository.Add(terminalBankParam);
 
-                    var userNameBankParam = new ApplicationBankParam();
-                    userNameBankParam.CreatedBy = 1;
-                    userNameBankParam.CreationDate = DateTime.Now;
-                    userNameBankParam.ParamKey = "MellatUserName";
-                    userNameBankParam.ParamValue = userName;
-                    userNameBankParam.Status = 0;
-                    userNameBankParam.ApplicationBankId = applicationBank.Id;
+                    var userNameBankParam = new ApplicationBankParam
+                    {
+                        CreatedBy = 1,
+                        CreationDate = DateTime.Now,
+                        ParamKey = "MellatUserName",
+                        ParamValue = userName,
+                        Status = 0,
+                        ApplicationBankId = applicationBank.Id
+                    };
                     await _applicationBankParamRepository.Add(userNameBankParam);
 
-                    var passwordBankParam = new ApplicationBankParam();
-                    passwordBankParam.CreatedBy = 1;
-                    passwordBankParam.CreationDate = DateTime.Now;
-                    passwordBankParam.ParamKey = "MellatPassword";
-                    passwordBankParam.ParamValue = password;
-                    passwordBankParam.Status = 0;
-                    passwordBankParam.ApplicationBankId = applicationBank.Id;
+                    var passwordBankParam = new ApplicationBankParam
+                    {
+                        CreatedBy = 1,
+                        CreationDate = DateTime.Now,
+                        ParamKey = "MellatPassword",
+                        ParamValue = password,
+                        Status = 0,
+                        ApplicationBankId = applicationBank.Id
+                    };
                     await _applicationBankParamRepository.Add(passwordBankParam);
                     return Ok();
                 }

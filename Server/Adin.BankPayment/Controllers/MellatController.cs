@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web;
@@ -14,30 +13,14 @@ namespace Adin.BankPayment.Controllers
 {
     public class MellatController : Controller
     {
-        private readonly IRepository<ApplicationBank> _applicationBankRepository;
-        private readonly IRepository<Application> _applicationRepository;
-        private readonly IRepository<Bank> _bankRepository;
-        private readonly bool _isError = false;
         private readonly ILogger<MellatController> _logger;
-        private readonly string _referenceNumber = string.Empty;
-        private readonly string _reservationNumber = string.Empty;
-        private readonly string _succeedMsg = "";
-        private readonly string _traceNumber = string.Empty;
         private readonly IRepository<Transaction> _transactionRepository;
-        private readonly string _transactionState = string.Empty;
-        private readonly string _webBaseUrl = "";
 
         public MellatController(ILogger<MellatController> logger,
-            IRepository<Transaction> transactionRepository,
-            IRepository<Application> applicationRepository,
-            IRepository<Bank> bankRepository,
-            IRepository<ApplicationBank> applicationBankRepository)
+            IRepository<Transaction> transactionRepository)
         {
             _logger = logger;
             _transactionRepository = transactionRepository;
-            _applicationRepository = applicationRepository;
-            _bankRepository = bankRepository;
-            _applicationBankRepository = applicationBankRepository;
         }
 
         [HttpPost]
@@ -63,57 +46,44 @@ namespace Adin.BankPayment.Controllers
                 transaction.Status == (byte) TransactionStatusEnum.Cancel)
                 return BadRequest();
 
-            var longurl = transaction.CallbackUrl;
-            var uriBuilder = new UriBuilder(longurl);
+            var longUrl = transaction.CallbackUrl;
+            var uriBuilder = new UriBuilder(longUrl);
             var query = HttpUtility.ParseQueryString(uriBuilder.Query);
-            _logger.LogError(longurl);
+            _logger.LogError(longUrl);
+            ErrorCodeEnum bankErrorCode;
             if (string.IsNullOrEmpty(Request.Form["SaleReferenceId"].ToString()))
             {
-                var bankErrorCode = ErrorCodeEnum.UnkownError;
-                var _errorMsg = "رسید قابل قبول نیست";
+                bankErrorCode = ErrorCodeEnum.UnkownError;
+                var errorMsg = "رسید قابل قبول نیست";
                 //ResCode=StatusPayment
                 if (!string.IsNullOrEmpty(Request.Form["ResCode"].ToString()))
                 {
-                    _errorMsg = MellatHelper.MellatResult(Request.Form["ResCode"].ToString());
+                    errorMsg = MellatHelper.MellatResult(Request.Form["ResCode"].ToString());
                     bankErrorCode = MellatHelper.ErrorResult(Request.Form["ResCode"].ToString());
                 }
 
-                return await ReturnErrorPage(transaction, (byte) bankErrorCode, _errorMsg);
+                return await ReturnErrorPage(transaction, (byte) bankErrorCode, errorMsg);
             }
 
+            bankErrorCode = ErrorCodeEnum.NoError;
             try
             {
-                var applicationBank = await _applicationBankRepository.GetFirstBy(x =>
-                    x.ApplicationId == transaction.ApplicationId && x.BankId == transaction.BankId);
-
-                var TerminalId = applicationBank.ApplicationBankParams
-                    .FirstOrDefault(x => x.ParamKey == "MellatTerminalId").ParamValue;
-
-                var UserName = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatUserName")
-                    .ParamValue;
-                var Password = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatPassword")
-                    .ParamValue;
-
-                long SaleOrderId = 0; //PaymentID 
-                long SaleReferenceId = 0;
-                string RefId = null;
                 try
                 {
-                    SaleOrderId = long.Parse(Request.Form["SaleOrderId"].ToString().TrimEnd());
+                    var SaleOrderId = long.Parse(Request.Form["SaleOrderId"].ToString().TrimEnd());
 
-                    SaleReferenceId = long.Parse(Request.Form["SaleReferenceId"].ToString().TrimEnd());
+                    var SaleReferenceId = long.Parse(Request.Form["SaleReferenceId"].ToString().TrimEnd());
 
-                    RefId = Request.Form["RefId"].ToString().TrimEnd();
+                    var RefId = Request.Form["RefId"].ToString().TrimEnd();
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex.Message);
-                    var message =
+                    const string message =
                         " وضعیت:مشکلی در پرداخت بوجود آمده ، در صورتی که وجه پرداختی از حساب بانکی شما کسر شده است آن مبلغ به صورت خودکار برگشت داده خواهد شد ";
                     return await ReturnErrorPage(transaction, (byte) ErrorCodeEnum.UnkownError, message);
                 }
 
-                var bankErrorCode = ErrorCodeEnum.NoError;
                 transaction.BankErrorCode = (byte) bankErrorCode;
                 transaction.Status = (byte) TransactionStatusEnum.BankOk;
                 transaction.ModifiedOn = DateTime.Now;
@@ -131,9 +101,9 @@ namespace Adin.BankPayment.Controllers
 
                 uriBuilder.Query = query.ToString();
 
-                longurl = uriBuilder.ToString();
+                longUrl = uriBuilder.ToString();
 
-                var url3 = string.Format(longurl);
+                var url3 = string.Format(longUrl);
                 return Redirect(url3);
             }
             catch (Exception ex)
@@ -154,8 +124,8 @@ namespace Adin.BankPayment.Controllers
         public async Task<IActionResult> ReturnErrorPage(Transaction transaction, byte bankErrorCode,
             string errorMessage = "")
         {
-            var longurl = transaction.CallbackUrl;
-            var uriBuilder = new UriBuilder(longurl);
+            var longUrl = transaction.CallbackUrl;
+            var uriBuilder = new UriBuilder(longUrl);
             var query = HttpUtility.ParseQueryString(uriBuilder.Query);
 
             transaction.Status = (byte) TransactionStatusEnum.Failed;
@@ -171,8 +141,8 @@ namespace Adin.BankPayment.Controllers
             query["errorCode"] = bankErrorCode.ToString();
             query["message"] = errorMessage;
             uriBuilder.Query = query.ToString();
-            longurl = uriBuilder.ToString();
-            var url = string.Format(longurl);
+            longUrl = uriBuilder.ToString();
+            var url = string.Format(longUrl);
             return Redirect(url);
         }
     }

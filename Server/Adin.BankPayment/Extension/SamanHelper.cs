@@ -29,23 +29,20 @@ namespace Adin.BankPayment.Extension
         {
             var verifyTransactionResult = new VerifyTransactionResponseModel();
 
-
-            //WebService Instance
-
             var applicationBanks = await _applicationBankRepository.GetFirstBy(x =>
                 x.BankId == transaction.BankId && x.ApplicationId == transaction.ApplicationId);
             var samanParams = applicationBanks.ApplicationBankParams.ToList();
             var midParam = samanParams.FirstOrDefault(x => x.ParamKey == "MID");
-            //var passwordParam = samanParams.FirstOrDefault(x => x.ParamKey == "Password");
+
+            if (midParam == null)
+                return verifyTransactionResult;
+
             var samanGateway = new SamanGateway(midParam.ParamValue);
 
             var result = samanGateway.verifyTransaction(transaction.BankTrackCode);
 
             if (result > 0)
             {
-                //if (result == (double)transaction.Amount) // چک کردن مبلغ بازگشتی از سرویس با مبلغ تراکنش
-                //{
-
                 _logger.LogDebug("Verify Done");
                 var message = "بانک صحت رسيد ديجيتالي شما را تصديق نمود. فرايند خريد تکميل گشت";
                 message += "<br/>" + " شماره رسید : " + transaction.BankTrackCode;
@@ -62,7 +59,7 @@ namespace Adin.BankPayment.Extension
             }
 
             var errorMsg = TransactionChecking((int) result);
-            _logger.LogDebug("resultcode" + result);
+            _logger.LogDebug("Result code: " + result);
             transaction.Status = (byte) TransactionStatusEnum.ErrorOnVerify;
             transaction.BankErrorCode = Convert.ToInt32(result);
             transaction.BankErrorMessage = errorMsg;
@@ -73,6 +70,7 @@ namespace Adin.BankPayment.Extension
             verifyTransactionResult.Status = false;
             verifyTransactionResult.ErrorCode = (byte) ErrorCodeEnum.VerifyError;
             verifyTransactionResult.Message = errorMsg;
+
             return verifyTransactionResult;
         }
 
@@ -85,7 +83,7 @@ namespace Adin.BankPayment.Extension
                 case -1: //TP_ERROR
                     errorMsg = "بروز خطا درهنگام بررسي صحت رسيد ديجيتالي در نتيجه خريد شما تاييد نگرييد" + "-1";
                     break;
-                case -2: //ACCOUNTS_DONT_MATCH
+                case -2: //ACCOUNTS_DON'T_MATCH
                     errorMsg = "بروز خطا در هنگام تاييد رسيد ديجيتالي در نتيجه خريد شما تاييد نگرييد" + "-2";
                     break;
                 case -3: //BAD_INPUT

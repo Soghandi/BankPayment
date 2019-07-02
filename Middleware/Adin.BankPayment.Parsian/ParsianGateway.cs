@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using ParsianPaymentService;
+using Adin.BankPayment.Parsian.Connected_Services.ParsianPaymentService;
 
 namespace Adin.BankPayment.Parsian
 {

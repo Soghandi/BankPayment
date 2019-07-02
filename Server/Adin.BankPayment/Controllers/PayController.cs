@@ -17,21 +17,15 @@ namespace Adin.BankPayment.Controllers
     public class PayController : Controller
     {
         private readonly IRepository<ApplicationBank> _applicationBankRepository;
-        private readonly IRepository<Application> _applicationRepository;
-        private readonly IRepository<Bank> _bankRepository;
         private readonly ILogger<PayController> _logger;
         private readonly IRepository<Transaction> _transactionRepository;
 
         public PayController(ILogger<PayController> logger,
             IRepository<Transaction> transactionRepository,
-            IRepository<Application> applicationRepository,
-            IRepository<Bank> bankRepository,
             IRepository<ApplicationBank> applicationBankRepository)
         {
             _logger = logger;
             _transactionRepository = transactionRepository;
-            _applicationRepository = applicationRepository;
-            _bankRepository = bankRepository;
             _applicationBankRepository = applicationBankRepository;
         }
 
@@ -70,7 +64,6 @@ namespace Adin.BankPayment.Controllers
                     var parsianGateway = new ParsianGateway(pinParam.ParamValue);
                     var resp = await parsianGateway.PinPaymentRequest(Convert.ToInt32(transaction.Amount),
                         Convert.ToInt32(transaction.UserTrackCode), transaction.CallbackUrl);
-                    var paramsInfo = applicationBank.ApplicationBankParams.ToList();
                     if (resp.Body.status == 0)
                     {
                         _logger.LogInformation("authority after callback", resp.Body.authority);
@@ -106,40 +99,39 @@ namespace Adin.BankPayment.Controllers
 
                 case (byte) BankCodeEnum.Mellat:
                     _logger.LogInformation("mellat");
-                    var termialParam =
+                    var terminalParam =
                         applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatTerminalId");
                     var userNameParam =
                         applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatUserName");
                     var passwordParam =
                         applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatPassword");
 
-                    var terminalID = termialParam.ParamValue;
+                    var terminalId = terminalParam.ParamValue;
                     var userName = userNameParam.ParamValue;
                     var password = passwordParam.ParamValue;
-                    var mellatGateway = new MellatGateway(terminalID, userName, password);
+                    var mellatGateway = new MellatGateway(terminalId, userName, password);
                     var mellatResp = await mellatGateway.bpPayRequest(Convert.ToInt32(transaction.Amount),
                         Convert.ToInt32(transaction.UserTrackCode), transaction.BankRedirectUrl);
-                    var mellatParamsInfo = applicationBank.ApplicationBankParams.ToList();
                     _logger.LogError((mellatResp == null).ToString());
 
                     if (mellatResp != null)
                     {
                         _logger.LogError(mellatResp.Body.@return);
 
-                        var ResultArray = mellatResp.Body.@return.Split(',');
-                        if (ResultArray[0] == "0")
+                        var resultArray = mellatResp.Body.@return.Split(',');
+                        if (resultArray[0] == "0")
                         {
-                            var refId = ResultArray[1];
+                            var refId = resultArray[1];
                             transaction.BankTrackCode = refId;
                             await _transactionRepository.Update(transaction);
                             ViewBag.RefId = refId;
                             return View("Mellat", transaction);
                         }
 
-                        _logger.LogError("Critical Error: Payment Error. StatusCode={0}", ResultArray[0]);
-                        transaction.ErrorCode = (byte) MellatHelper.ErrorResult(ResultArray[0]);
-                        transaction.BankErrorCode = Convert.ToInt32(ResultArray[0]);
-                        transaction.BankErrorMessage = MellatHelper.MellatResult(ResultArray[0]);
+                        _logger.LogError("Critical Error: Payment Error. StatusCode={0}", resultArray[0]);
+                        transaction.ErrorCode = (byte) MellatHelper.ErrorResult(resultArray[0]);
+                        transaction.BankErrorCode = Convert.ToInt32(resultArray[0]);
+                        transaction.BankErrorMessage = MellatHelper.MellatResult(resultArray[0]);
                         await _transactionRepository.Update(transaction);
                         return BadRequest(transaction.BankErrorMessage);
                     }

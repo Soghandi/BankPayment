@@ -115,7 +115,8 @@ namespace Adin.BankPayment.Connector
                         Status = ApiStatusCodeEnum.InvalidPublicKey,
                         Body = new VerifyTransactionResponseModel
                         {
-                            Message = "Unauthorized - عملیات با خطا مواجه شد"
+                            Message = "عملیات با خطا مواجه شد",
+                            Status = false
                         }
                     };
                 return new OutputModel<VerifyTransactionResponseModel>
@@ -123,7 +124,8 @@ namespace Adin.BankPayment.Connector
                     Status = ApiStatusCodeEnum.BadRequest,
                     Body = new VerifyTransactionResponseModel
                     {
-                        Message = "عملیات با خطا مواجه شد"
+                        Message = "عملیات با خطا مواجه شد",
+                        Status = false
                     }
                 };
             }

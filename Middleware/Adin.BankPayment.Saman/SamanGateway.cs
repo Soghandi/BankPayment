@@ -1,4 +1,4 @@
-﻿using SamanService;
+﻿using Adin.BankPayment.Saman.Connected_Services.SamanService;
 
 namespace Adin.BankPayment.Saman
 {
@@ -7,27 +7,24 @@ namespace Adin.BankPayment.Saman
         private readonly string MID;
         private readonly string Password;
 
-        private readonly PaymentIFBindingSoapClient referencePaymentClient =
+        private readonly PaymentIFBindingSoapClient _referencePaymentClient =
             new PaymentIFBindingSoapClient(PaymentIFBindingSoapClient.EndpointConfiguration.PaymentIFBindingSoap);
-
-        private string redirectUrl;
 
         public SamanGateway(string samanMID, string password = "")
         {
             MID = samanMID;
             Password = password;
         }
-
-
+        
         public double verifyTransaction(string refnum)
         {
-            var result1 = referencePaymentClient.verifyTransactionAsync(refnum, MID).Result;
+            var result1 = _referencePaymentClient.verifyTransactionAsync(refnum, MID).Result;
             return result1;
         }
 
         public double reverseTransaction(string refnum)
         {
-            var result1 = referencePaymentClient.reverseTransactionAsync(refnum, MID, MID, Password).Result;
+            var result1 = _referencePaymentClient.reverseTransactionAsync(refnum, MID, MID, Password).Result;
             return result1;
         }
     }

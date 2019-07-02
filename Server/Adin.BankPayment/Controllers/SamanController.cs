@@ -11,49 +11,36 @@ namespace Adin.BankPayment.Controllers
 {
     public class SamanController : Controller
     {
-        private readonly IRepository<ApplicationBank> _applicationBankRepository;
-        private readonly IRepository<Application> _applicationRepository;
-        private readonly IRepository<Bank> _bankRepository;
         private readonly ILogger<SamanController> _logger;
         private readonly IRepository<Transaction> _transactionRepository;
         private string _errorMsg = "";
-        private bool _isError;
         private string _referenceNumber = string.Empty;
         private string _reservationNumber = string.Empty;
         private string _traceNumber = string.Empty;
         private string _transactionState = string.Empty;
-        private string _webBaseUrl = "";
 
         public SamanController(ILogger<SamanController> logger,
-            IRepository<Transaction> transactionRepository,
-            IRepository<Application> applicationRepository,
-            IRepository<Bank> bankRepository,
-            IRepository<ApplicationBank> applicationBankRepository)
+            IRepository<Transaction> transactionRepository)
         {
             _logger = logger;
             _transactionRepository = transactionRepository;
-            _applicationRepository = applicationRepository;
-            _bankRepository = bankRepository;
-            _applicationBankRepository = applicationBankRepository;
         }
 
         [HttpPost]
         public async Task<IActionResult> Callback(string token, string secondTrackCode)
         {
-            _webBaseUrl = string.Format("{0}://{1}", Request.Scheme, Request.Host);
             _logger.LogDebug("CallBack");
             _logger.LogDebug("token:" + token);
             _logger.LogDebug("secondTrackCode:" + secondTrackCode);
             var transaction = await _transactionRepository.Get(Guid.Parse(secondTrackCode));
 
-            if (transaction.Status == (byte) TransactionStatusEnum.Success ||
-                transaction.Status == (byte) TransactionStatusEnum.Cancel)
+            if (transaction.Status == (byte)TransactionStatusEnum.Success ||
+                transaction.Status == (byte)TransactionStatusEnum.Cancel)
                 return BadRequest();
 
-            var longurl = transaction.CallbackUrl;
-            var uriBuilder = new UriBuilder(longurl);
+            var longUrl = transaction.CallbackUrl;
+            var uriBuilder = new UriBuilder(longUrl);
             var query = HttpUtility.ParseQueryString(uriBuilder.Query);
-            var message = "";
             var refNum = Request.Form["RefNum"];
 
             var bankErrorCode = ErrorCodeEnum.UnkownError;
@@ -61,11 +48,12 @@ namespace Adin.BankPayment.Controllers
             {
                 if (RequestUnpack())
                 {
+                    _logger.LogDebug($"TransactionId: {secondTrackCode}; _transactionState : {_transactionState}");
                     if (_transactionState.Equals("OK"))
                     {
                         bankErrorCode = ErrorCodeEnum.NoError;
-                        transaction.BankErrorCode = (byte) bankErrorCode;
-                        transaction.Status = (byte) TransactionStatusEnum.BankOk;
+                        transaction.BankErrorCode = (byte)bankErrorCode;
+                        transaction.Status = (byte)TransactionStatusEnum.BankOk;
                         transaction.ModifiedOn = DateTime.Now;
                         transaction.ModifiedBy = 1;
                         transaction.BankTrackCode = refNum;
@@ -74,20 +62,18 @@ namespace Adin.BankPayment.Controllers
                         query["id"] = transaction.Id.ToString();
                         query["trackCode"] = transaction.UserTrackCode;
                         query["status"] = true.ToString();
-                        query["errorCode"] = bankErrorCode.ToString();
-                        query["message"] = message;
+                        query["errorCode"] = ((byte)bankErrorCode).ToString();
+                        query["message"] = string.Empty;
                         uriBuilder.Query = query.ToString();
-                        longurl = uriBuilder.ToString();
-                        var url3 = string.Format(longurl);
+                        longUrl = uriBuilder.ToString();
+                        var url3 = string.Format(longUrl);
                         return Redirect(url3);
                     }
 
-                    _isError = true;
                     _errorMsg = "متاسفانه بانک خريد شما را تاييد نکرده است";
                     if (_transactionState.Equals("CanceledByUser") || _transactionState.Equals(string.Empty))
                     {
                         // Transaction was canceled by user
-                        _isError = true;
                         _errorMsg = "تراكنش توسط خريدار كنسل شد";
                         bankErrorCode = ErrorCodeEnum.CanceledByUser;
                     }
@@ -191,10 +177,9 @@ namespace Adin.BankPayment.Controllers
             }
 
             _logger.LogError(_errorMsg);
-            var mid1 = Request.Form["MID"];
 
-            transaction.Status = (byte) TransactionStatusEnum.Failed;
-            transaction.BankErrorCode = (byte) bankErrorCode;
+            transaction.Status = (byte)TransactionStatusEnum.Failed;
+            transaction.BankErrorCode = (byte)bankErrorCode;
             transaction.BankErrorMessage = _errorMsg;
             transaction.ModifiedOn = DateTime.Now;
             transaction.ModifiedBy = 1;
@@ -203,11 +188,11 @@ namespace Adin.BankPayment.Controllers
             query["id"] = transaction.Id.ToString();
             query["trackCode"] = transaction.UserTrackCode;
             query["status"] = false.ToString();
-            query["errorCode"] = ((byte) bankErrorCode).ToString();
+            query["errorCode"] = ((byte)bankErrorCode).ToString();
             query["message"] = _errorMsg;
             uriBuilder.Query = query.ToString();
-            longurl = uriBuilder.ToString();
-            var url = string.Format(longurl);
+            longUrl = uriBuilder.ToString();
+            var url = string.Format(longUrl);
             return Redirect(url);
         }
 
@@ -225,39 +210,6 @@ namespace Adin.BankPayment.Controllers
             _logger.LogDebug(_traceNumber);
 
             return true;
-        }
-
-        private bool RequestFeildIsEmpty()
-        {
-            _logger.LogDebug("RequestFeildIsEmpty");
-            if (Request.Form["state"].ToString().Equals(string.Empty))
-            {
-                _logger.LogError("state");
-                _isError = true;
-                _errorMsg =
-                    "خريد شما توسط بانک تاييد شده است اما رسيد ديجيتالي شما تاييد نگشت! مشکلي در فرايند رزرو خريد شما پيش آمده است";
-                return true;
-            }
-
-            if (Request.Form["RefNum"].ToString().Equals(string.Empty) &&
-                Request.Form["state"].ToString().Equals(string.Empty))
-            {
-                _logger.LogError("RefNum");
-                _isError = true;
-                _errorMsg = "فرايند انتقال وجه با موفقيت انجام شده است اما فرايند تاييد رسيد ديجيتالي با خطا مواجه گشت";
-                return true;
-            }
-
-            if (Request.Form["ResNum"].ToString().Equals(string.Empty) &&
-                Request.Form["state"].ToString().Equals(string.Empty))
-            {
-                _logger.LogError("ResNum");
-                _isError = true;
-                _errorMsg = "خطا در برقرار ارتباط با بانک";
-                return true;
-            }
-
-            return false;
         }
     }
 }
