@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Adin.BankPayment.Connector.Model
+﻿namespace Adin.BankPayment.Connector.Model
 {
     public class TokenModel
     {

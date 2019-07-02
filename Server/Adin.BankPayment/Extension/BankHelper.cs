@@ -1,16 +1,11 @@
-﻿using Adin.BankPayment.Connector.Model;
+﻿using System.Threading.Tasks;
+using Adin.BankPayment.Connector.Model;
 using Adin.BankPayment.Domain.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Adin.BankPayment.Extension
 {
-    public interface BankHelper
+    public interface IBankHelper
     {
         Task<VerifyTransactionResponseModel> VerifyTransaction(Transaction transaction);
     }
-
-    
 }

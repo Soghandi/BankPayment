@@ -1,8 +1,6 @@
-﻿using Adin.BankPayment.Domain.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
+using Adin.BankPayment.Domain.Context;
+using Adin.BankPayment.Domain.Model;
 
 namespace Adin.BankPayment.Util
 {
@@ -10,14 +8,11 @@ namespace Adin.BankPayment.Util
     {
         public Application Validate(string publicKey)
         {
-            using (var context = new BankPayment.Domain.Context.BankPaymentContext())
+            using (var context = new BankPaymentContext())
             {
                 var app = context.Applications.FirstOrDefault(x => x.PublicKey == publicKey);
                 if (app == null) return null;
-                else
-                {
-                    return app;
-                }
+                return app;
             }
         }
     }

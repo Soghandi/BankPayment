@@ -1,5 +1,3 @@
-using System;
-
 namespace Adin.BankPayment.Models
 {
     public class ErrorViewModel

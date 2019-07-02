@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace MellayPaymentService
+namespace Adin.BankPayment.Mellat.Connected_Services.MellayPaymentService
 {
     
     

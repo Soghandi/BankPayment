@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ParsianPaymentService
+namespace Adin.BankPayment.Parsian.Connected_Services.ParsianPaymentService
 {
     
     

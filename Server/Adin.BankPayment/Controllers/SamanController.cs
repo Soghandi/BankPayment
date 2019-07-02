@@ -1,68 +1,54 @@
-﻿using Adin.BankPayment.Connector.Enum;
+﻿using System;
+using System.Threading.Tasks;
+using System.Web;
+using Adin.BankPayment.Connector.Enum;
 using Adin.BankPayment.Domain.Model;
 using Adin.BankPayment.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
-using System.Web;
 
 namespace Adin.BankPayment.Controllers
 {
     public class SamanController : Controller
     {
+        private readonly ILogger<SamanController> _logger;
+        private readonly IRepository<Transaction> _transactionRepository;
+        private string _errorMsg = "";
         private string _referenceNumber = string.Empty;
         private string _reservationNumber = string.Empty;
-        private string _transactionState = string.Empty;
         private string _traceNumber = string.Empty;
-        private bool _isError = false;
-        private string _errorMsg = "";
-        private string _webBaseUrl = "";
-        private readonly ILogger<SamanController> _logger;
-        private IRepository<Transaction> _transactionRepository;
-        private readonly IRepository<Application> _applicationRepository;
-        private readonly IRepository<Bank> _bankRepository;
-        private readonly IRepository<ApplicationBank> _applicationBankRepository;
+        private string _transactionState = string.Empty;
 
         public SamanController(ILogger<SamanController> logger,
-                               IRepository<Transaction> transactionRepository,
-                               IRepository<Application> applicationRepository,
-                               IRepository<Bank> bankRepository,
-                               IRepository<ApplicationBank> applicationBankRepository)
+            IRepository<Transaction> transactionRepository)
         {
             _logger = logger;
             _transactionRepository = transactionRepository;
-            _applicationRepository = applicationRepository;
-            _bankRepository = bankRepository;
-            _applicationBankRepository = applicationBankRepository;
         }
 
         [HttpPost]
         public async Task<IActionResult> Callback(string token, string secondTrackCode)
         {
-            _webBaseUrl = string.Format("{0}://{1}", Request.Scheme, Request.Host);
             _logger.LogDebug("CallBack");
             _logger.LogDebug("token:" + token);
             _logger.LogDebug("secondTrackCode:" + secondTrackCode);
-            Transaction transaction = await _transactionRepository.Get(Guid.Parse(secondTrackCode));
+            var transaction = await _transactionRepository.Get(Guid.Parse(secondTrackCode));
 
             if (transaction.Status == (byte)TransactionStatusEnum.Success ||
                 transaction.Status == (byte)TransactionStatusEnum.Cancel)
-            {
                 return BadRequest();
-            }
 
-            string longurl = transaction.CallbackUrl;
-            var uriBuilder = new UriBuilder(longurl);
+            var longUrl = transaction.CallbackUrl;
+            var uriBuilder = new UriBuilder(longUrl);
             var query = HttpUtility.ParseQueryString(uriBuilder.Query);
-            string message = "";
             var refNum = Request.Form["RefNum"];
 
-            ErrorCodeEnum bankErrorCode = ErrorCodeEnum.UnkownError;
+            var bankErrorCode = ErrorCodeEnum.UnkownError;
             try
             {
                 if (RequestUnpack())
                 {
+                    _logger.LogDebug($"TransactionId: {secondTrackCode}; _transactionState : {_transactionState}");
                     if (_transactionState.Equals("OK"))
                     {
                         bankErrorCode = ErrorCodeEnum.NoError;
@@ -74,117 +60,113 @@ namespace Adin.BankPayment.Controllers
                         await _transactionRepository.Update(transaction);
 
                         query["id"] = transaction.Id.ToString();
-                        query["trackCode"] = transaction.UserTrackCode.ToString();
+                        query["trackCode"] = transaction.UserTrackCode;
                         query["status"] = true.ToString();
-                        query["errorCode"] = bankErrorCode.ToString();
-                        query["message"] = message;
+                        query["errorCode"] = ((byte)bankErrorCode).ToString();
+                        query["message"] = string.Empty;
                         uriBuilder.Query = query.ToString();
-                        longurl = uriBuilder.ToString();
-                        var url3 = string.Format(longurl);
+                        longUrl = uriBuilder.ToString();
+                        var url3 = string.Format(longUrl);
                         return Redirect(url3);
                     }
-                    else
+
+                    _errorMsg = "متاسفانه بانک خريد شما را تاييد نکرده است";
+                    if (_transactionState.Equals("CanceledByUser") || _transactionState.Equals(string.Empty))
                     {
-                        _isError = true;
-                        _errorMsg = "متاسفانه بانک خريد شما را تاييد نکرده است";
-                        if (_transactionState.Equals("CanceledByUser") || _transactionState.Equals(string.Empty))
-                        {
-                            // Transaction was canceled by user
-                            _isError = true;
-                            _errorMsg = "تراكنش توسط خريدار كنسل شد";
-                            bankErrorCode = ErrorCodeEnum.CanceledByUser;
-                        }
-                        //InvalidParameters
-                        else if (_transactionState.Equals("InvalidParameters"))
-                        {
-                            // Amount of revers teransaction is more than teransaction
-                            _errorMsg = "پارامترهای ارسال شده به بانک اشتباه است";
-                            bankErrorCode = ErrorCodeEnum.InvalidParameters;
-                        }
-                        else if (_transactionState.Equals("InvalidAmount"))
-                        {
-                            // Amount of revers teransaction is more than teransaction
-                            _errorMsg = "مبلغ تراکنش معکوس بیشتر از مبلغ تراکنش است";
-                            bankErrorCode = ErrorCodeEnum.InvalidAmount;
-                        }
-                        else if (_transactionState.Equals("InvalidTransaction"))
-                        {
-                            // Can not find teransaction
-                            _errorMsg = "تراکنش معتبر نمی باشد";
-                            bankErrorCode = ErrorCodeEnum.InvalidTransaction;
-                        }
-                        else if (_transactionState.Equals("InvalidCardNumber"))
-                        {
-                            // Card number is wrong
-                            _errorMsg = "شماره کارت معتبر نمی باشد";
-                            bankErrorCode = ErrorCodeEnum.InvalidCardNumber;
-                        }
-                        else if (_transactionState.Equals("NoSuchIssuer"))
-                        {
-                            // Issuer can not find
-                            _errorMsg = "صادر کننده پیدا نشد";
-                            bankErrorCode = ErrorCodeEnum.NoSuchIssuer;
-                        }
-                        else if (_transactionState.Equals("ExpiredCardPickUp"))
-                        {
-                            // The card is expired
-                            _errorMsg = "کارت انتخاب شده منقضی شده است";
-                            bankErrorCode = ErrorCodeEnum.ExpiredCardPickUp;
-                        }
-                        else if (_transactionState.Equals("AllowablePINTriesExceededPickUp"))
-                        {
-                            // For third time user enter a wrong PIN so card become invalid
-                            _errorMsg = "پین انتخاب شده محدودیت کارت دارد";
-                            bankErrorCode = ErrorCodeEnum.AllowablePINTriesExceededPickUp;
-                        }
-                        else if (_transactionState.Equals("IncorrectPIN"))
-                        {
-                            // Pin card is wrong
-                            _errorMsg = "پین کد اشتباه است";
-                            bankErrorCode = ErrorCodeEnum.IncorrectPIN;
-                        }
-                        else if (_transactionState.Equals("ExceedsWithdrawalAmountLimit"))
-                        {
-                            // Exceeds withdrawal from amount limit
-                            _errorMsg = "پرداخت بیشتر از از حد مجاز می باشد";
-                            bankErrorCode = ErrorCodeEnum.ExceedsWithdrawalAmountLimit;
-                        }
-                        else if (_transactionState.Equals("TransactionCannotBeCompleted"))
-                        {
-                            // PIN and PAD are currect but Transaction Cannot Be Completed
-                            _errorMsg = "تراکنش کامل نشد";
-                            bankErrorCode = ErrorCodeEnum.TransactionCannotBeCompleted;
-                        }
-                        else if (_transactionState.Equals("ResponseReceivedTooLate"))
-                        {
-                            // Timeout occur
-                            _errorMsg = "جواب کاربر بیشتر از حد مجاز طول کشید";
-                            bankErrorCode = ErrorCodeEnum.ResponseReceivedTooLate;
-                        }
-                        else if (_transactionState.Equals("SuspectedFraudPickUp"))
-                        {
-                            // User did not insert cvv2 & expiredate or they are wrong.
-                            _errorMsg = "کاربر اطلاعات کارت خود را به درستی وارد نکرده است";
-                            bankErrorCode = ErrorCodeEnum.SuspectedFraudPickUp;
-                        }
-                        else if (_transactionState.Equals("NoSufficientFunds"))
-                        {
-                            // there are not suficient funds in the account
-                            _errorMsg = "موجودی کافی نمی باشد";
-                            bankErrorCode = ErrorCodeEnum.NoSufficientFunds;
-                        }
-                        else if (_transactionState.Equals("IssuerDownSlm"))
-                        {
-                            // The bank server is down
-                            _errorMsg = "سرور بانک غیرفعال است";
-                            bankErrorCode = ErrorCodeEnum.BankServerIsDown;
-                        }
-                        else if (_transactionState.Equals("TMEError"))
-                        {
-                            // unknown error occur
-                            _errorMsg = "خطای ناشناخته";
-                            bankErrorCode = ErrorCodeEnum.UnkownError;
-                        }
+                        // Transaction was canceled by user
+                        _errorMsg = "تراكنش توسط خريدار كنسل شد";
+                        bankErrorCode = ErrorCodeEnum.CanceledByUser;
+                    }
+                    //InvalidParameters
+                    else if (_transactionState.Equals("InvalidParameters"))
+                    {
+                        // Amount of revers teransaction is more than teransaction
+                        _errorMsg = "پارامترهای ارسال شده به بانک اشتباه است";
+                        bankErrorCode = ErrorCodeEnum.InvalidParameters;
+                    }
+                    else if (_transactionState.Equals("InvalidAmount"))
+                    {
+                        // Amount of revers teransaction is more than teransaction
+                        _errorMsg = "مبلغ تراکنش معکوس بیشتر از مبلغ تراکنش است";
+                        bankErrorCode = ErrorCodeEnum.InvalidAmount;
+                    }
+                    else if (_transactionState.Equals("InvalidTransaction"))
+                    {
+                        // Can not find teransaction
+                        _errorMsg = "تراکنش معتبر نمی باشد";
+                        bankErrorCode = ErrorCodeEnum.InvalidTransaction;
+                    }
+                    else if (_transactionState.Equals("InvalidCardNumber"))
+                    {
+                        // Card number is wrong
+                        _errorMsg = "شماره کارت معتبر نمی باشد";
+                        bankErrorCode = ErrorCodeEnum.InvalidCardNumber;
+                    }
+                    else if (_transactionState.Equals("NoSuchIssuer"))
+                    {
+                        // Issuer can not find
+                        _errorMsg = "صادر کننده پیدا نشد";
+                        bankErrorCode = ErrorCodeEnum.NoSuchIssuer;
+                    }
+                    else if (_transactionState.Equals("ExpiredCardPickUp"))
+                    {
+                        // The card is expired
+                        _errorMsg = "کارت انتخاب شده منقضی شده است";
+                        bankErrorCode = ErrorCodeEnum.ExpiredCardPickUp;
+                    }
+                    else if (_transactionState.Equals("AllowablePINTriesExceededPickUp"))
+                    {
+                        // For third time user enter a wrong PIN so card become invalid
+                        _errorMsg = "پین انتخاب شده محدودیت کارت دارد";
+                        bankErrorCode = ErrorCodeEnum.AllowablePINTriesExceededPickUp;
+                    }
+                    else if (_transactionState.Equals("IncorrectPIN"))
+                    {
+                        // Pin card is wrong
+                        _errorMsg = "پین کد اشتباه است";
+                        bankErrorCode = ErrorCodeEnum.IncorrectPIN;
+                    }
+                    else if (_transactionState.Equals("ExceedsWithdrawalAmountLimit"))
+                    {
+                        // Exceeds withdrawal from amount limit
+                        _errorMsg = "پرداخت بیشتر از از حد مجاز می باشد";
+                        bankErrorCode = ErrorCodeEnum.ExceedsWithdrawalAmountLimit;
+                    }
+                    else if (_transactionState.Equals("TransactionCannotBeCompleted"))
+                    {
+                        // PIN and PAD are currect but Transaction Cannot Be Completed
+                        _errorMsg = "تراکنش کامل نشد";
+                        bankErrorCode = ErrorCodeEnum.TransactionCannotBeCompleted;
+                    }
+                    else if (_transactionState.Equals("ResponseReceivedTooLate"))
+                    {
+                        // Timeout occur
+                        _errorMsg = "جواب کاربر بیشتر از حد مجاز طول کشید";
+                        bankErrorCode = ErrorCodeEnum.ResponseReceivedTooLate;
+                    }
+                    else if (_transactionState.Equals("SuspectedFraudPickUp"))
+                    {
+                        // User did not insert cvv2 & expiredate or they are wrong.
+                        _errorMsg = "کاربر اطلاعات کارت خود را به درستی وارد نکرده است";
+                        bankErrorCode = ErrorCodeEnum.SuspectedFraudPickUp;
+                    }
+                    else if (_transactionState.Equals("NoSufficientFunds"))
+                    {
+                        // there are not suficient funds in the account
+                        _errorMsg = "موجودی کافی نمی باشد";
+                        bankErrorCode = ErrorCodeEnum.NoSufficientFunds;
+                    }
+                    else if (_transactionState.Equals("IssuerDownSlm"))
+                    {
+                        // The bank server is down
+                        _errorMsg = "سرور بانک غیرفعال است";
+                        bankErrorCode = ErrorCodeEnum.BankServerIsDown;
+                    }
+                    else if (_transactionState.Equals("TMEError"))
+                    {
+                        // unknown error occur
+                        _errorMsg = "خطای ناشناخته";
+                        bankErrorCode = ErrorCodeEnum.UnkownError;
                     }
                 }
             }
@@ -195,7 +177,6 @@ namespace Adin.BankPayment.Controllers
             }
 
             _logger.LogError(_errorMsg);
-            var mid1 = Request.Form["MID"];
 
             transaction.Status = (byte)TransactionStatusEnum.Failed;
             transaction.BankErrorCode = (byte)bankErrorCode;
@@ -205,13 +186,13 @@ namespace Adin.BankPayment.Controllers
             await _transactionRepository.Update(transaction);
 
             query["id"] = transaction.Id.ToString();
-            query["trackCode"] = transaction.UserTrackCode.ToString();
+            query["trackCode"] = transaction.UserTrackCode;
             query["status"] = false.ToString();
             query["errorCode"] = ((byte)bankErrorCode).ToString();
             query["message"] = _errorMsg;
             uriBuilder.Query = query.ToString();
-            longurl = uriBuilder.ToString();
-            var url = string.Format(longurl);
+            longUrl = uriBuilder.ToString();
+            var url = string.Format(longUrl);
             return Redirect(url);
         }
 
@@ -229,35 +210,6 @@ namespace Adin.BankPayment.Controllers
             _logger.LogDebug(_traceNumber);
 
             return true;
-        }
-
-        private bool RequestFeildIsEmpty()
-        {
-            _logger.LogDebug("RequestFeildIsEmpty");
-            if (Request.Form["state"].ToString().Equals(string.Empty))
-            {
-                _logger.LogError("state");
-                _isError = true;
-                _errorMsg = "خريد شما توسط بانک تاييد شده است اما رسيد ديجيتالي شما تاييد نگشت! مشکلي در فرايند رزرو خريد شما پيش آمده است";
-                return true;
-            }
-
-            if (Request.Form["RefNum"].ToString().Equals(string.Empty) && Request.Form["state"].ToString().Equals(string.Empty))
-            {
-                _logger.LogError("RefNum");
-                _isError = true;
-                _errorMsg = "فرايند انتقال وجه با موفقيت انجام شده است اما فرايند تاييد رسيد ديجيتالي با خطا مواجه گشت";
-                return true;
-            }
-
-            if (Request.Form["ResNum"].ToString().Equals(string.Empty) && Request.Form["state"].ToString().Equals(string.Empty))
-            {
-                _logger.LogError("ResNum");
-                _isError = true;
-                _errorMsg = "خطا در برقرار ارتباط با بانک";
-                return true;
-            }
-            return false;
         }
     }
 }

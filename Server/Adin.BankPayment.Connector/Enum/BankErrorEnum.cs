@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Adin.BankPayment.Connector.Enum
+﻿namespace Adin.BankPayment.Connector.Enum
 {
     public enum ErrorCodeEnum
     {
-
         NoError = 0,
         CanceledByUser = 1,
         InvalidParameters = 2,
@@ -24,19 +19,18 @@ namespace Adin.BankPayment.Connector.Enum
         BankServerIsDown = 13,
         InvalidAmount = 14,
         UnkownError = 15,
-        InvalidPassword=16,
-        BankIssuerIsInvalid=17,
+        InvalidPassword = 16,
+        BankIssuerIsInvalid = 17,
         InvalidIP = 18,
-        InvalidBillCode=19,
+        InvalidBillCode = 19,
         InvalidPaymentCode = 20,
-        AlreadyVerified=21,
-        InvalidDate=22,
-        InvalidTime=23,
-        InternalError=24,
-        VerifyError = 100,               
-        InvalidPin = 200,//پين فروشنده درست نميباشد :
-        OperationAlreadyDone = 201,//عمليات قبلا با موفقيت انجام شده است
-        UserTrackCodeIsInvalid= 202,//شماره تراكنش فروشنده درست نميباشد        
-
+        AlreadyVerified = 21,
+        InvalidDate = 22,
+        InvalidTime = 23,
+        InternalError = 24,
+        VerifyError = 100,
+        InvalidPin = 200, //پين فروشنده درست نميباشد :
+        OperationAlreadyDone = 201, //عمليات قبلا با موفقيت انجام شده است
+        UserTrackCodeIsInvalid = 202 //شماره تراكنش فروشنده درست نميباشد        
     }
 }
