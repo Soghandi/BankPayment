@@ -1,4 +1,4 @@
-﻿using Adin.BankPayment.Saman.Connected_Services.SamanService;
+﻿using Adin.BankPayment.Saman.Connected_Services.SamanServiceNew;
 
 namespace Adin.BankPayment.Saman
 {
