@@ -14,6 +14,7 @@
 Include: Saman , Parsian , Behpardakht (Mellat) , ....</Description>
     <PackageLicenseUrl>https://github.com/Soghandi/BankPayment/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/Soghandi/BankPayment</RepositoryUrl>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
