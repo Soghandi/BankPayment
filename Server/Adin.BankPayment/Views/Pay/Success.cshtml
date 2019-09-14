@@ -1,20 +1,19 @@
 ﻿@{
     Layout = null;
 }
+<html>
+<head>
+    <link href="~/css/bootstrap.css" rel="stylesheet" />
+</head>
+<body style="display:flex">
 
+    <div class="alert alert-success movetopage" style="margin: 0 auto; align-self: center;">
+        تراکنش با موفقیت انجام شد
 
-<br/>
-<br/>
-<br/>
-<br/>
-<div class="alert alert-success movetopage">
-    تراکنش با موفقیت انجام شد
-</div>
-<br/>
-<div class="alert alert-success movetopage">
-    @ViewBag.TrackCode
-</div>
-<br/>
-<br/>
-<br/>
-<br/>
+        <br />
+
+        @ViewBag.TrackCode
+    </div>
+
+</body>
+</html>

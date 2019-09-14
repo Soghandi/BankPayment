@@ -8,8 +8,9 @@
 </head>
 <body style="display:flex">
 
-    <form action="@Model.Bank.PostUrl" method="POST" id="frmSendToBank">
-        <input type="hidden" name="RefId" value="@ViewBag.RefId" />
+    <form method="post" action="@Model.Bank.PostUrl" id="frmSendToBank">
+        <input type="hidden" name="username" value="@ViewBag.Username">
+        <input type="hidden" name="traceNumber" value="@ViewBag.traceNumber">
     </form>
 
     <div style="margin: 0 auto; align-self: center;" class="alert alert-success movetopage">

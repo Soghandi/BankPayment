@@ -5,6 +5,7 @@
         Default = 0,
         Saman = 1,
         Parsian = 2,
-        Mellat = 3
+        Mellat = 3,
+        Efarda = 4
     }
 }

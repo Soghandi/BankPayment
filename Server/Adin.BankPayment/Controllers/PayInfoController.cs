@@ -16,7 +16,6 @@ namespace Adin.BankPayment.Controllers
     public class PayInfoController : BaseController
     {
         private readonly IRepository<ApplicationBank> _applicationBankRepository;
-        private readonly IRepository<Application> _applicationRepository;
         private readonly IRepository<Bank> _bankRepository;
         private readonly ILogger<PayController> _logger;
         private readonly IRepository<Transaction> _transactionRepository;
@@ -30,14 +29,13 @@ namespace Adin.BankPayment.Controllers
         {
             _logger = logger;
             _transactionRepository = transactionRepository;
-            _applicationRepository = applicationRepository;
             _bankRepository = bankRepository;
             _applicationBankRepository = applicationBankRepository;
         }
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> RequestPay([FromBody] PayInfoModel model)
+        public async Task<IActionResult> RequestPay([FromBody]PayInfoModel model)
         {
             try
             {
@@ -52,8 +50,7 @@ namespace Adin.BankPayment.Controllers
                         throw new NotImplementedException("Dollar not supported yet");
                 }
 
-                //Todo: Find Best Bank For User
-                var bank = await _bankRepository.GetFirstBy(x => x.Code == (byte) model.BankCode);
+                var bank = await _bankRepository.GetFirstBy(x => x.Code == (byte)model.BankCode);
                 var transaction = new Transaction
                 {
                     Amount = model.Amount,
@@ -63,7 +60,7 @@ namespace Adin.BankPayment.Controllers
                     Mobile = model.Mobile,
                     UserTrackCode = model.TrackCode,
                     CreationDate = DateTime.Now,
-                    Status = (byte) TransactionStatusEnum.Initial,
+                    Status = (byte)TransactionStatusEnum.Initial,
                     CallbackUrl = model.CallbackUrl,
                     ExpirationTime = model.ExpirationTime
                 };
@@ -74,41 +71,30 @@ namespace Adin.BankPayment.Controllers
                 switch (model.BankCode)
                 {
                     case BankCodeEnum.Parsian:
-                        var parsianRedirectUrl =
-                            $"{currentBaseUrl}/Parsian/Callback?token={model.TrackCode}&SecondTrackCode={transaction.Id}";
-                        transaction.BankRedirectUrl = parsianRedirectUrl;
-                        await _transactionRepository.Update(transaction);
-                        return Ok(
-                            new PayRequestResponseModel
-                            {
-                                Code = transaction.Id,
-                                Url = currentBaseUrl + "/Pay/" + transaction.Id
-                            });
+                        transaction.BankRedirectUrl = $"{currentBaseUrl}/Parsian/Callback?token={model.TrackCode}&SecondTrackCode={transaction.Id}";
+                        break;
 
                     case BankCodeEnum.Mellat:
-                        var mellatRedirectUrl =
-                            $"{currentBaseUrl}/Mellat/Callback?token={model.TrackCode}&SecondTrackCode={transaction.Id}";
-                        transaction.BankRedirectUrl = mellatRedirectUrl;
-                        await _transactionRepository.Update(transaction);
-                        return Ok(
-                            new PayRequestResponseModel
-                            {
-                                Code = transaction.Id,
-                                Url = currentBaseUrl + "/Pay/" + transaction.Id
-                            });
+                        transaction.BankRedirectUrl = $"{currentBaseUrl}/Mellat/Callback?token={model.TrackCode}&SecondTrackCode={transaction.Id}";
+                        break;
+
+                    case BankCodeEnum.Efarda:
+                        transaction.BankRedirectUrl = $"{currentBaseUrl}/Efarda/Callback?token={model.TrackCode}&SecondTrackCode={transaction.Id}";
+                        break;
+
                     case BankCodeEnum.Saman:
                     default:
-                        var redirectUrl =
-                            $"{currentBaseUrl}/Saman/Callback?token={model.TrackCode}&SecondTrackCode={transaction.Id}";
-                        transaction.BankRedirectUrl = redirectUrl;
-                        await _transactionRepository.Update(transaction);
-                        return Ok(
-                            new PayRequestResponseModel
-                            {
-                                Code = transaction.Id,
-                                Url = currentBaseUrl + "/Pay/" + transaction.Id
-                            });
+                        transaction.BankRedirectUrl = $"{currentBaseUrl}/Saman/Callback?token={model.TrackCode}&SecondTrackCode={transaction.Id}";
+                        break;
                 }
+
+                await _transactionRepository.Update(transaction);
+                return Ok(
+                    new PayRequestResponseModel
+                    {
+                        Code = transaction.Id,
+                        Url = currentBaseUrl + "/Pay/" + transaction.Id
+                    });
             }
             catch (Exception ex)
             {
@@ -133,13 +119,17 @@ namespace Adin.BankPayment.Controllers
 
                 switch (transaction.Bank.Code)
                 {
-                    case (byte) BankCodeEnum.Mellat:
-                        var mellatHelper =
-                            new MellatHelper(_logger, _transactionRepository, _applicationBankRepository);
+                    case (byte)BankCodeEnum.Mellat:
+                        var mellatHelper = new MellatHelper(_logger, _transactionRepository, _applicationBankRepository);
                         var mellatResult = await mellatHelper.VerifyTransaction(transaction);
                         return Ok(mellatResult);
 
-                    case (byte) BankCodeEnum.Saman:
+                    case (byte)BankCodeEnum.Efarda:
+                        var efardaHelper = new EfardaHelper(_logger, _transactionRepository, _applicationBankRepository);
+                        var efardaResult = await efardaHelper.VerifyTransaction(transaction);
+                        return Ok(efardaResult);
+
+                    case (byte)BankCodeEnum.Saman:
                     default:
                         var samanHelper = new SamanHelper(_logger, _transactionRepository, _applicationBankRepository);
                         var result = await samanHelper.VerifyTransaction(transaction);
@@ -167,22 +157,22 @@ namespace Adin.BankPayment.Controllers
                 var transaction = await _transactionRepository.Get(id);
                 if (transaction == null) return Unauthorized();
 
-                if (transaction.Status == (byte) TransactionStatusEnum.BankOk ||
-                    transaction.Status == (byte) TransactionStatusEnum.Success)
+                if (transaction.Status == (byte)TransactionStatusEnum.BankOk ||
+                    transaction.Status == (byte)TransactionStatusEnum.Success)
                     return BadRequest(new CancelPaymentResponseModel
                     {
-                        ErrorCode = (byte) ErrorCodeEnum.OperationAlreadyDone,
+                        ErrorCode = (byte)ErrorCodeEnum.OperationAlreadyDone,
                         Message = "پرداخت قبلا انجام شده است",
                         Status = false
                     });
 
-                transaction.Status = (byte) TransactionStatusEnum.Cancel;
+                transaction.Status = (byte)TransactionStatusEnum.Cancel;
                 transaction.ModifiedBy = 1;
                 transaction.ModifiedOn = DateTime.Now;
                 await _transactionRepository.Update(transaction);
                 return Ok(new CancelPaymentResponseModel
                 {
-                    ErrorCode = (byte) ErrorCodeEnum.NoError,
+                    ErrorCode = (byte)ErrorCodeEnum.NoError,
                     Message = "پرداخت با موفقیت کنسل شد ",
                     Status = true
                 });

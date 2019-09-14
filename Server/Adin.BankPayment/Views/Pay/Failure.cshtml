@@ -1,17 +1,19 @@
 ﻿@{
     Layout = null;
 }
-<br/>
-<br/>
-<br/>
-<br/>
-<div class="alert alert-success movetopage">
-    خطایی رخ داد
-</div>
-<br/>
-<div class="alert alert-success movetopage">
-    @ViewBag.Message
-</div>
-<br/>
-<br/>
-<br/>
+<html>
+<head>
+    <link href="~/css/bootstrap.css" rel="stylesheet" />
+</head>
+<body style="display:flex">
+
+    <div style="margin: 0 auto; align-self: center;" class="alert alert-success movetopage">
+        خطایی رخ داد
+
+        <br />
+
+        @ViewBag.Message
+    </div>
+
+</body>
+</html>
