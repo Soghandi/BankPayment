@@ -98,7 +98,7 @@ namespace Adin.BankPayment.TokenProvider
             var response = new
             {
                 access_token = encodedJwt,
-                expires_in = (int) _options.Expiration.TotalSeconds
+                expires_in = (int)_options.Expiration.TotalSeconds
             };
 
             // Serialize and return the response

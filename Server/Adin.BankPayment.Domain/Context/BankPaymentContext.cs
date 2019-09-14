@@ -87,6 +87,17 @@ namespace Adin.BankPayment.Domain.Context
                     Title = "ملت",
                     Id = Guid.Parse("98504148-3d89-4abb-9fb5-281bed8714e3"),
                     Status = 0
+                },
+                new Bank
+                {
+                    Code = 4,
+                    CreatedBy = 1,
+                    CreationDate = DateTime.Now,
+                    IsDeleted = false,
+                    PostUrl = "https://pf.efarda.ir/pf/api/ipg/purchase",
+                    Title = "تجارت الکترونیکی ارتباط فردا",
+                    Id = Guid.Parse("8c4d3794-983f-4610-bf88-abe8db1ad07d"),
+                    Status = 0
                 });
         }
     }

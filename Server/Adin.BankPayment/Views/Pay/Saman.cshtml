@@ -1,42 +1,31 @@
-﻿@using Adin.BankPayment.Domain.Model
-@model Adin.BankPayment.Domain.Model.Transaction
+﻿@model Transaction
 @{
     Layout = null;
 }
-<form action="@Model.Bank.PostUrl" method="POST" id="frmSendToBank">
-    <input type="hidden" name="Amount" value="@Convert.ToInt64(Model.Amount)" />
-    <input type="hidden" name="ResNum" value="@Model.UserTrackCode" />
-    <input type="hidden" name="RedirectURL" value="@Model.BankRedirectUrl" />
-    <input type="hidden" name="CellNumber" value="@Model.Mobile" />
-    @foreach (var item in (List<ApplicationBankParam>)ViewBag.Params)
-    {
-        <input type="hidden" name="@item.ParamKey" value="@item.ParamValue" />
-    }
-</form>
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<div class="alert alert-success movetopage">
-    در حال انتقال به درگاه پرداخت بانک...
-</div>
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
+<html>
+<head>
+    <link href="~/css/bootstrap.css" rel="stylesheet" />
+</head>
+<body style="display:flex">
 
-<script type="text/javascript">
-    document.getElementById("frmSendToBank").submit();
-</script>
+    <form action="@Model.Bank.PostUrl" method="POST" id="frmSendToBank">
+        <input type="hidden" name="Amount" value="@Convert.ToInt64(Model.Amount)" />
+        <input type="hidden" name="ResNum" value="@Model.UserTrackCode" />
+        <input type="hidden" name="RedirectURL" value="@Model.BankRedirectUrl" />
+        <input type="hidden" name="CellNumber" value="@Model.Mobile" />
+        @foreach (var item in (List<ApplicationBankParam>)ViewBag.Params)
+        {
+            <input type="hidden" name="@item.ParamKey" value="@item.ParamValue" />
+        }
+    </form>
+
+    <div style="margin: 0 auto; align-self: center;" class="alert alert-success movetopage">
+        در حال انتقال به درگاه پرداخت ...
+    </div>
+
+    <script type="text/javascript">
+        document.getElementById("frmSendToBank").submit();
+    </script>
+
+</body>
+</html>

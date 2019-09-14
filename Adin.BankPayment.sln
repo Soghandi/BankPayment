@@ -29,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Adin.BankPayment", "Server\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Adin.BankPayment.ClientSample", "Client\Adin.BankPayment.ClientSample\Adin.BankPayment.ClientSample.csproj", "{78D75710-14C7-46E4-BDEA-39F792E5ECB2}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Adin.BankPayment.Efarda", "Middleware\Adin.BankPayment.Efarda\Adin.BankPayment.Efarda.csproj", "{CDDAC930-F73D-4041-A4A8-AC5BE997C20E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -109,6 +111,14 @@ Global
 		{78D75710-14C7-46E4-BDEA-39F792E5ECB2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{78D75710-14C7-46E4-BDEA-39F792E5ECB2}.Release|x64.ActiveCfg = Release|x64
 		{78D75710-14C7-46E4-BDEA-39F792E5ECB2}.Release|x64.Build.0 = Release|x64
+		{CDDAC930-F73D-4041-A4A8-AC5BE997C20E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDDAC930-F73D-4041-A4A8-AC5BE997C20E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDDAC930-F73D-4041-A4A8-AC5BE997C20E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CDDAC930-F73D-4041-A4A8-AC5BE997C20E}.Debug|x64.Build.0 = Debug|Any CPU
+		{CDDAC930-F73D-4041-A4A8-AC5BE997C20E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDDAC930-F73D-4041-A4A8-AC5BE997C20E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDDAC930-F73D-4041-A4A8-AC5BE997C20E}.Release|x64.ActiveCfg = Release|Any CPU
+		{CDDAC930-F73D-4041-A4A8-AC5BE997C20E}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -123,6 +133,7 @@ Global
 		{C67810CC-C18B-4088-AC83-6258558006EB} = {9BFB9372-3218-45DD-8836-1804000926CF}
 		{33C4EC43-8011-42CB-98F3-975FA996EEAD} = {9BFB9372-3218-45DD-8836-1804000926CF}
 		{78D75710-14C7-46E4-BDEA-39F792E5ECB2} = {51DA86D1-0339-44F9-B6C6-1AB795F6C5E2}
+		{CDDAC930-F73D-4041-A4A8-AC5BE997C20E} = {4B4D028A-B4C2-444E-8120-824BB7346AFF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EB161E29-E2AB-43B6-8561-2EBE44A48EE1}

@@ -48,7 +48,7 @@ namespace Adin.BankPayment.Controllers
                 var application = new Application
                 {
                     IsDeleted = false,
-                    Status = (byte) ApplicationEnum.Normal,
+                    Status = (byte)ApplicationEnum.Normal,
                     Title = title,
                     CreatedBy = 1,
                     CreationDate = DateTime.Now,
@@ -66,7 +66,6 @@ namespace Adin.BankPayment.Controllers
             }
         }
 
-
         [HttpPost]
         public async Task<IActionResult> SetSamanParams(string publicKey, string MID)
         {
@@ -74,7 +73,7 @@ namespace Adin.BankPayment.Controllers
             {
                 var application = await _applicationRepository.GetFirstBy(x => x.PublicKey == publicKey);
                 if (application == null) return Unauthorized();
-                var bank = await _bankRepository.GetFirstBy(x => x.Code == (byte) BankCodeEnum.Saman);
+                var bank = await _bankRepository.GetFirstBy(x => x.Code == (byte)BankCodeEnum.Saman);
                 var applicationBank =
                     await _applicationBankRepository.GetFirstBy(x =>
                         x.ApplicationId == application.Id && x.BankId == bank.Id);
@@ -120,7 +119,7 @@ namespace Adin.BankPayment.Controllers
             {
                 var application = await _applicationRepository.GetFirstBy(x => x.PublicKey == publicKey);
                 if (application == null) return Unauthorized();
-                var bank = await _bankRepository.GetFirstBy(x => x.Code == (byte) BankCodeEnum.Parsian);
+                var bank = await _bankRepository.GetFirstBy(x => x.Code == (byte)BankCodeEnum.Parsian);
                 var applicationBank =
                     await _applicationBankRepository.GetFirstBy(x =>
                         x.ApplicationId == application.Id && x.BankId == bank.Id);
@@ -160,14 +159,13 @@ namespace Adin.BankPayment.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SetMellatParams(string publicKey, string terminalId, string userName,
-            string password)
+        public async Task<IActionResult> SetMellatParams(string publicKey, string terminalId, string userName, string password)
         {
             try
             {
                 var application = await _applicationRepository.GetFirstBy(x => x.PublicKey == publicKey);
                 if (application == null) return Unauthorized();
-                var bank = await _bankRepository.GetFirstBy(x => x.Code == (byte) BankCodeEnum.Mellat);
+                var bank = await _bankRepository.GetFirstBy(x => x.Code == (byte)BankCodeEnum.Mellat);
                 var applicationBank =
                     await _applicationBankRepository.GetFirstBy(x =>
                         x.ApplicationId == application.Id && x.BankId == bank.Id);
@@ -232,6 +230,91 @@ namespace Adin.BankPayment.Controllers
                     applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatPassword");
                 passwordParam.ParamValue = password;
                 await _applicationBankRepository.Update(applicationBank);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest();
+            }
+        }
+
+         [HttpPost]
+        public async Task<IActionResult> SetEfardaParams(string publicKey, string serviceId, string userName, string password)
+        {
+            try
+            {
+                var application = await _applicationRepository.GetFirstBy(x => x.PublicKey == publicKey);
+                if (application == null) return Unauthorized();
+
+                var bank = await _bankRepository.GetFirstBy(x => x.Code == (byte)BankCodeEnum.Efarda);
+                var applicationBank =
+                    await _applicationBankRepository.GetFirstBy(x =>
+                        x.ApplicationId == application.Id && x.BankId == bank.Id);
+
+                if (applicationBank == null)
+                {
+                    applicationBank = new ApplicationBank
+                    {
+                        CreatedBy = 1,
+                        BankId = bank.Id,
+                        Status = 0,
+                        ApplicationId = application.Id,
+                        CreationDate = DateTime.Now
+                    };
+                    await _applicationBankRepository.Add(applicationBank);
+
+                    var terminalBankParam = new ApplicationBankParam
+                    {
+                        CreatedBy = 1,
+                        CreationDate = DateTime.Now,
+                        ParamKey = "serviceId",
+                        ParamValue = serviceId,
+                        Status = 0,
+                        ApplicationBankId = applicationBank.Id
+                    };
+                    await _applicationBankParamRepository.Add(terminalBankParam);
+
+                    var userNameBankParam = new ApplicationBankParam
+                    {
+                        CreatedBy = 1,
+                        CreationDate = DateTime.Now,
+                        ParamKey = "userName",
+                        ParamValue = userName,
+                        Status = 0,
+                        ApplicationBankId = applicationBank.Id
+                    };
+                    await _applicationBankParamRepository.Add(userNameBankParam);
+
+                    var passwordBankParam = new ApplicationBankParam
+                    {
+                        CreatedBy = 1,
+                        CreationDate = DateTime.Now,
+                        ParamKey = "password",
+                        ParamValue = password,
+                        Status = 0,
+                        ApplicationBankId = applicationBank.Id
+                    };
+                    await _applicationBankParamRepository.Add(passwordBankParam);
+
+                    return Ok();
+                }
+
+                var serviceIdParam =
+                    applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "serviceId");
+                serviceIdParam.ParamValue = serviceId;
+                await _applicationBankRepository.Update(applicationBank);
+
+                var userNameParam =
+                    applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "userName");
+                userNameParam.ParamValue = userName;
+                await _applicationBankRepository.Update(applicationBank);
+
+                var passwordParam =
+                    applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "password");
+                passwordParam.ParamValue = password;
+                await _applicationBankRepository.Update(applicationBank);
+
                 return Ok();
             }
             catch (Exception ex)
