@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Adin.BankPayment.Efarda
@@ -41,14 +41,14 @@ namespace Adin.BankPayment.Efarda
 
                 HttpClient httpClient = new HttpClient();
 
-                var content = new StringContent(JsonConvert.SerializeObject(getTraceModel),
+                var content = new StringContent(JsonSerializer.Serialize(getTraceModel),
                     Encoding.UTF8,
                     "application/json");
 
                 var result = await httpClient.PostAsync($"{BaseUrl}/ipg/getTraceId", content);
                 if (result.IsSuccessStatusCode)
                 {
-                    EfardaGetTraceResultModel getTraceResult = JsonConvert.DeserializeObject<EfardaGetTraceResultModel>(await result.Content.ReadAsStringAsync());
+                    EfardaGetTraceResultModel getTraceResult = JsonSerializer.Deserialize<EfardaGetTraceResultModel>(await result.Content.ReadAsStringAsync());
 
                     (bool Success, string Message) = EfardaErrors.GetResult(getTraceResult.result);
 
@@ -82,14 +82,14 @@ namespace Adin.BankPayment.Efarda
 
                 HttpClient httpClient = new HttpClient();
 
-                var content = new StringContent(JsonConvert.SerializeObject(efardaVerifyModel),
+                var content = new StringContent(JsonSerializer.Serialize(efardaVerifyModel),
                     Encoding.UTF8,
                     "application/json");
 
                 var result = await httpClient.PostAsync($"{BaseUrl}/ipg/verify", content);
                 if (result.IsSuccessStatusCode)
                 {
-                    EfardaVerifyResultModel getTraceResult = JsonConvert.DeserializeObject<EfardaVerifyResultModel>(await result.Content.ReadAsStringAsync());
+                    EfardaVerifyResultModel getTraceResult = JsonSerializer.Deserialize<EfardaVerifyResultModel>(await result.Content.ReadAsStringAsync());
 
                     (bool Success, string Message) = EfardaErrors.GetResult(getTraceResult.result);
 

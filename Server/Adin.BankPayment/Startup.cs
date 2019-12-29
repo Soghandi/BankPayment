@@ -79,7 +79,7 @@ namespace Adin.BankPayment
 
 
             services.AddMemoryCache();
-            services.AddMvc();
+            services.AddMvc(e => e.EnableEndpointRouting = false);
         }
 
 
@@ -133,11 +133,10 @@ namespace Adin.BankPayment
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (env.EnvironmentName == "Development")
             {
-                app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
             }
             else

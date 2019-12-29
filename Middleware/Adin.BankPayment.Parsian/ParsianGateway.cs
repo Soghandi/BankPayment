@@ -11,7 +11,6 @@ namespace Adin.BankPayment.Parsian
         private readonly string Pin;
 
         private string Password;
-        private string redirectUrl;
 
         public ParsianGateway(string pin, string password = "")
         {
