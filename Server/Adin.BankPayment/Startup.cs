@@ -63,8 +63,6 @@ namespace Adin.BankPayment
                 Console.WriteLine(ex.Message);
             }
 
-
-            services.AddDbContext<BankPaymentContext>(options => options.UseSqlServer(connection));
             services.AddTransient<IRepository<Transaction>, TransactionRepository>();
             services.AddTransient<IRepository<Application>, ApplicationRepository>();
             services.AddTransient<IRepository<ApplicationBank>, ApplicationBankRepository>();
@@ -73,11 +71,9 @@ namespace Adin.BankPayment
 
             SecretKey = Configuration.GetSection("SecretKey").Value;
             signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SecretKey));
-
-
+            
             ConnectionStringGetter.ConStr = Configuration.GetSection("ConnectionString").Value;
-
-
+            
             services.AddMemoryCache();
             services.AddMvc(e => e.EnableEndpointRouting = false);
         }
