@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace Adin.BankPayment.TokenProvider
 {
@@ -25,7 +25,7 @@ namespace Adin.BankPayment.TokenProvider
         private readonly ILogger _logger;
         private readonly RequestDelegate _next;
         private readonly TokenProviderOptions _options;
-        private readonly JsonSerializerSettings _serializerSettings;
+        private readonly JsonSerializerOptions _serializerOptions;
 
         public TokenProviderMiddleware(
             RequestDelegate next,
@@ -38,9 +38,9 @@ namespace Adin.BankPayment.TokenProvider
             _options = options.Value;
             ThrowIfInvalidOptions(_options);
 
-            _serializerSettings = new JsonSerializerSettings
+            _serializerOptions = new JsonSerializerOptions
             {
-                Formatting = Formatting.Indented
+                WriteIndented = true
             };
         }
 
@@ -103,7 +103,7 @@ namespace Adin.BankPayment.TokenProvider
 
             // Serialize and return the response
             context.Response.ContentType = "application/json";
-            await context.Response.WriteAsync(JsonConvert.SerializeObject(response, _serializerSettings));
+            await context.Response.WriteAsync(JsonSerializer.Serialize(response, _serializerOptions));
         }
 
         private static void ThrowIfInvalidOptions(TokenProviderOptions options)
