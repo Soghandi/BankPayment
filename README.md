@@ -10,14 +10,8 @@ Easily connect to Iranian bank gateways without getting involved with their cont
       <ul>
         <li>Saman</li>
         <li>Mellat (behpardakht)</li>
-		<li>Efarda (Ertebat Farda - efarda.ir)</li>
-  </ul>
-  
-<br/>
-<b>
-  In Progress:</b>
-      <ul>
-        <li>Parsian</li>        
+	<li>Efarda (Ertebat Farda - efarda.ir)</li>
+	<li>Parsian</li>
   </ul>
 <br/>
 <b>
