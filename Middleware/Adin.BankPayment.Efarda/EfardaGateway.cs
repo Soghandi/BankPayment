@@ -50,7 +50,7 @@ namespace Adin.BankPayment.Efarda
                 {
                     EfardaGetTraceResultModel getTraceResult = JsonSerializer.Deserialize<EfardaGetTraceResultModel>(await result.Content.ReadAsStringAsync());
 
-                    (bool Success, string Message) = EfardaErrors.GetResult(getTraceResult.result);
+                    var (Success, Message) = EfardaErrors.GetResult(getTraceResult.result);
 
                     if (Success)
                     {

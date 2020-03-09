@@ -117,24 +117,15 @@ namespace Adin.BankPayment.Controllers
                 var transaction = await _transactionRepository.Get(id);
                 if (transaction == null) return Unauthorized();
 
-                switch (transaction.Bank.Code)
+                IBankHelper bankHelper = transaction.Bank.Code switch
                 {
-                    case (byte)BankCodeEnum.Mellat:
-                        var mellatHelper = new MellatHelper(_logger, _transactionRepository, _applicationBankRepository);
-                        var mellatResult = await mellatHelper.VerifyTransaction(transaction);
-                        return Ok(mellatResult);
-
-                    case (byte)BankCodeEnum.Efarda:
-                        var efardaHelper = new EfardaHelper(_logger, _transactionRepository, _applicationBankRepository);
-                        var efardaResult = await efardaHelper.VerifyTransaction(transaction);
-                        return Ok(efardaResult);
-
-                    case (byte)BankCodeEnum.Saman:
-                    default:
-                        var samanHelper = new SamanHelper(_logger, _transactionRepository, _applicationBankRepository);
-                        var result = await samanHelper.VerifyTransaction(transaction);
-                        return Ok(result);
-                }
+                    (byte)BankCodeEnum.Mellat => new MellatHelper(_logger, _transactionRepository, _applicationBankRepository),
+                    (byte)BankCodeEnum.Efarda => new EfardaHelper(_logger, _transactionRepository, _applicationBankRepository),
+                    (byte)BankCodeEnum.Parsian => new ParsianHelper(_logger, _transactionRepository, _applicationBankRepository),
+                    _ => new SamanHelper(_logger, _transactionRepository, _applicationBankRepository),
+                };
+                var Result = await bankHelper.VerifyTransaction(transaction);
+                return Ok(Result);
             }
             catch (Exception ex)
             {

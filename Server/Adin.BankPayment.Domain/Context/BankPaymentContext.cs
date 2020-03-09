@@ -72,7 +72,7 @@ namespace Adin.BankPayment.Domain.Context
                     CreatedBy = 1,
                     CreationDate = DateTime.Now,
                     IsDeleted = false,
-                    PostUrl = "https://pec.shaparak.ir/pecpaymentgateway/default.aspx?au={0}",
+                    PostUrl = "https://pec.shaparak.ir/NewIPG?Token={0}",
                     Title = "پارسیان",
                     Id = Guid.Parse("ab3f226a-be56-4092-bbd0-2ae8ffbce131"),
                     Status = 0

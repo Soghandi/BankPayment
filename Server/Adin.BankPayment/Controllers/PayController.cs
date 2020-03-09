@@ -63,21 +63,21 @@ namespace Adin.BankPayment.Controllers
                     var pinParam = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "ParsianPIN");
 
                     var parsianGateway = new ParsianGateway(pinParam.ParamValue);
-                    var resp = await parsianGateway.PinPaymentRequest(Convert.ToInt32(transaction.Amount),
-                        Convert.ToInt32(transaction.UserTrackCode), transaction.CallbackUrl);
-                    if (resp.Body.status == 0)
+                    var resp = await parsianGateway.SalePaymentRequestasync(Convert.ToInt64(transaction.Amount),
+                        Convert.ToInt64(transaction.UserTrackCode), transaction.BankRedirectUrl, transaction.Id.ToString());
+                    if (resp.Body.SalePaymentRequestResult.Status == 0)
                     {
-                        _logger.LogInformation("authority after callback", resp.Body.authority);
-                        var url = string.Format(applicationBank.Bank.PostUrl, resp.Body.authority);
-                        transaction.BankTrackCode = resp.Body.authority.ToString();
+                        _logger.LogInformation("authority after callback", resp.Body.SalePaymentRequestResult.Token);
+                        var url = string.Format(applicationBank.Bank.PostUrl, resp.Body.SalePaymentRequestResult.Token);
+                        transaction.BankTrackCode = resp.Body.SalePaymentRequestResult.Token.ToString();
                         await _transactionRepository.Update(transaction);
                         return Redirect(url);
                     }
                     else
                     {
-                        _logger.LogInformation("Critical Error: Payment Error. StatusCode={0}", resp.Body.status);
-                        transaction.BankTrackCode = resp.Body.authority.ToString();
-                        switch (resp.Body.status)
+                        _logger.LogInformation("Critical Error: Payment Error. StatusCode={0}", resp.Body.SalePaymentRequestResult.Status);
+                        transaction.BankTrackCode = resp.Body.SalePaymentRequestResult.Token.ToString();
+                        switch (resp.Body.SalePaymentRequestResult.Status)
                         {
                             case 20:
                             case 22:
@@ -105,7 +105,7 @@ namespace Adin.BankPayment.Controllers
                     var passwordParam = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatPassword");
 
                     var mellatGateway = new MellatGateway(terminalParam.ParamValue, userNameParam.ParamValue, passwordParam.ParamValue);
-                    var mellatResp = await mellatGateway.bpPayRequest(Convert.ToInt32(transaction.Amount),
+                    var mellatResp = await mellatGateway.BpPayRequest(Convert.ToInt32(transaction.Amount),
                         Convert.ToInt32(transaction.UserTrackCode), transaction.BankRedirectUrl);
                     _logger.LogError((mellatResp == null).ToString());
 
@@ -151,7 +151,7 @@ namespace Adin.BankPayment.Controllers
 
                     EfardaGateway efardaGateway = new EfardaGateway(_logger, EfardaUsername.ParamValue, EfardaPassword.ParamValue, EfardaServiceId.ParamValue);
                     var traceNumber = await efardaGateway.GetTraceId(transaction.UserTrackCode, transaction.Amount.ToString("###############0"), transaction.BankRedirectUrl, transaction.Mobile.HasValue ? transaction.Mobile.Value.ToString() : string.Empty);
-                    
+
                     transaction.BankTrackCode = traceNumber;
                     await _transactionRepository.Update(transaction);
 

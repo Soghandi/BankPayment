@@ -39,28 +39,28 @@ namespace Adin.BankPayment.Extension
 
             var samanGateway = new SamanGateway(midParam.ParamValue);
 
-            var result = samanGateway.verifyTransaction(transaction.BankTrackCode);
+            var result = await samanGateway.VerifyTransactionAsync(transaction.BankTrackCode);
 
             if (result > 0)
             {
                 _logger.LogDebug("Verify Done");
                 var message = "بانک صحت رسيد ديجيتالي شما را تصديق نمود. فرايند خريد تکميل گشت";
                 message += "<br/>" + " شماره رسید : " + transaction.BankTrackCode;
-                transaction.Status = (byte) TransactionStatusEnum.Success;
+                transaction.Status = (byte)TransactionStatusEnum.Success;
                 transaction.ModifiedOn = DateTime.Now;
                 transaction.ModifiedBy = 1;
                 await _transactionRepository.Update(transaction);
 
                 verifyTransactionResult.Status = true;
-                verifyTransactionResult.ErrorCode = (byte) ErrorCodeEnum.NoError;
+                verifyTransactionResult.ErrorCode = (byte)ErrorCodeEnum.NoError;
                 verifyTransactionResult.Message = message;
 
                 return verifyTransactionResult;
             }
 
-            var errorMsg = TransactionChecking((int) result);
+            var errorMsg = TransactionChecking((int)result);
             _logger.LogDebug("Result code: " + result);
-            transaction.Status = (byte) TransactionStatusEnum.ErrorOnVerify;
+            transaction.Status = (byte)TransactionStatusEnum.ErrorOnVerify;
             transaction.BankErrorCode = Convert.ToInt32(result);
             transaction.BankErrorMessage = errorMsg;
             transaction.ModifiedOn = DateTime.Now;
@@ -68,7 +68,7 @@ namespace Adin.BankPayment.Extension
             await _transactionRepository.Update(transaction);
 
             verifyTransactionResult.Status = false;
-            verifyTransactionResult.ErrorCode = (byte) ErrorCodeEnum.VerifyError;
+            verifyTransactionResult.ErrorCode = (byte)ErrorCodeEnum.VerifyError;
             verifyTransactionResult.Message = errorMsg;
 
             return verifyTransactionResult;

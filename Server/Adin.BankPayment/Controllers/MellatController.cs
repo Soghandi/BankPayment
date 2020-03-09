@@ -31,15 +31,6 @@ namespace Adin.BankPayment.Controllers
             var token = Request.Query["token"];
             var secondTrackCode = Request.Query["secondTrackCode"];
 
-            _logger.LogInformation("CallBack");
-            _logger.LogInformation("token:" + token);
-            _logger.LogInformation("secondTrackCode:" + secondTrackCode);
-
-            _logger.LogInformation(Request.Form["SaleReferenceId"].ToString());
-            _logger.LogInformation(Request.Form["ResCode"].ToString());
-            _logger.LogInformation(Request.Form["SaleOrderId"].ToString());
-            _logger.LogInformation(Request.Form["SaleReferenceId"].ToString());
-
             var transaction = await _transactionRepository.Get(Guid.Parse(secondTrackCode));
 
             if (transaction.Status == (byte) TransactionStatusEnum.Success ||
