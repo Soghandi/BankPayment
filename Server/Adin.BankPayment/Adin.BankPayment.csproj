@@ -44,9 +44,6 @@
     <Content Update="Views\Pay\Mellat.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Views\Pay\Parsian.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
     <Content Update="Views\Pay\Efarda.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>

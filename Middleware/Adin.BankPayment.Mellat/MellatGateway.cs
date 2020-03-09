@@ -19,10 +19,9 @@ namespace Adin.BankPayment.Mellat
             _userName = userName;
         }
 
-        public async Task<bpPayRequestResponse> bpPayRequest(int amount, int paymentNumber, string callbackUrl)
+        public async Task<bpPayRequestResponse> BpPayRequest(int amount, int paymentNumber, string callbackUrl)
         {
-            var terminalId = long.Parse(_terminalId);
-            var response = await _client.bpPayRequestAsync(terminalId,
+            return await _client.bpPayRequestAsync(long.Parse(_terminalId),
                 _userName,
                 _password,
                 paymentNumber,
@@ -33,66 +32,51 @@ namespace Adin.BankPayment.Mellat
                 callbackUrl,
                 long.Parse("0")
             );
-            return response;
         }
 
-        public async Task<bpInquiryRequestResponse> bpInquiryRequest(long SaleOrderId, long SaleReferenceId)
+        public async Task<bpInquiryRequestResponse> BpInquiryRequest(long SaleOrderId, long SaleReferenceId)
         {
-            var terminalId = long.Parse(_terminalId);
-            var response = await _client.bpInquiryRequestAsync(
+            return await _client.bpInquiryRequestAsync(
                 long.Parse(_terminalId),
                 _userName,
                 _password,
                 SaleOrderId,
                 SaleOrderId,
                 SaleReferenceId);
-
-            return response;
         }
 
-        public async Task<bpVerifyRequestResponse> bpVerifyRequest(long SaleOrderId, long SaleReferenceId)
+        public async Task<bpVerifyRequestResponse> BpVerifyRequest(long SaleOrderId, long SaleReferenceId)
         {
-            var terminalId = long.Parse(_terminalId);
-            var response = await _client.bpVerifyRequestAsync(
+            return await _client.bpVerifyRequestAsync(
                 long.Parse(_terminalId),
                 _userName,
                 _password,
                 SaleOrderId,
                 SaleOrderId,
                 SaleReferenceId);
-
-
-            return response;
         }
 
 
-        public async Task<bpSettleRequestResponse> bpSettleRequest(long SaleOrderId, long SaleReferenceId)
+        public async Task<bpSettleRequestResponse> BpSettleRequest(long SaleOrderId, long SaleReferenceId)
         {
-            var terminalId = long.Parse(_terminalId);
-            var response = await _client.bpSettleRequestAsync(
+            return await _client.bpSettleRequestAsync(
                 long.Parse(_terminalId),
                 _userName,
                 _password,
                 SaleOrderId,
                 SaleOrderId,
                 SaleReferenceId);
-
-
-            return response;
         }
 
-        public async Task<bpReversalRequestResponse> bpReversalRequest(long SaleOrderId, long SaleReferenceId)
+        public async Task<bpReversalRequestResponse> BpReversalRequest(long SaleOrderId, long SaleReferenceId)
         {
-            var terminalId = long.Parse(_terminalId);
-            var response = await _client.bpReversalRequestAsync(
+            return await _client.bpReversalRequestAsync(
                 long.Parse(_terminalId),
                 _userName,
                 _password,
                 SaleOrderId,
                 SaleOrderId,
                 SaleReferenceId);
-
-            return response;
         }
 
 

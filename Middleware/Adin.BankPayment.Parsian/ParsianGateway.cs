@@ -1,43 +1,47 @@
 ﻿using System.Threading.Tasks;
-using Adin.BankPayment.Parsian.Connected_Services.ParsianPaymentService;
+using Adin.BankPayment.Parsian.Connected_Services.SaleService;
+using Adin.BankPayment.Parsian.Connected_Services.ConfirmService;
 
 namespace Adin.BankPayment.Parsian
 {
     public class ParsianGateway
     {
-        private readonly EShopServiceSoapClient client =
-            new EShopServiceSoapClient(EShopServiceSoapClient.EndpointConfiguration.EShopServiceSoap);
+        private readonly SaleServiceSoapClient saleServiceSoapClient =
+             new SaleServiceSoapClient(SaleServiceSoapClient.EndpointConfiguration.SaleServiceSoap);
 
-        private readonly string Pin;
+        private readonly ConfirmServiceSoapClient confirmServiceSoapClient =
+             new ConfirmServiceSoapClient(ConfirmServiceSoapClient.EndpointConfiguration.ConfirmServiceSoap);
 
-        private string Password;
+        private readonly string _Pin;
 
-        public ParsianGateway(string pin, string password = "")
+        public ParsianGateway(string Pin)
         {
-            Pin = pin;
-            Password = password;
+            _Pin = Pin;
         }
 
-        public async Task<PinPaymentRequestResponse> PinPaymentRequest(int amount, int paymentNumber,
-            string callbackUrl)
+        public Task<SalePaymentRequestResponse> SalePaymentRequestasync(long Amount, long OrderId, string CallBackUrl, string AdditionalData)
         {
-            long authority = 0;
-            byte status = 1;
-            var response =
-                await client.PinPaymentRequestAsync(Pin, amount, paymentNumber, callbackUrl, authority, status);
-            return response;
+            return saleServiceSoapClient.SalePaymentRequestAsync(new ClientSaleRequestData()
+            {
+                LoginAccount = _Pin,
+                Amount = Amount,
+                OrderId = OrderId,
+                CallBackUrl = CallBackUrl,
+                AdditionalData = AdditionalData
+            });
         }
-
-        //public double verifyTransaction(string refnum)
-        //{
-        //    var result1 = referencePaymentClient.verifyTransactionAsync(refnum, MID).Result;
-        //    return result1;
-        //}
-
-        //public double reverseTransaction(string refnum)
-        //{        
-        //    var result1 = referencePaymentClient.reverseTransactionAsync(refnum, MID, MID, Password).Result;
-        //    return result1;
-        //}
+        /// <summary>
+        /// Verify Transaction Async
+        /// </summary>
+        /// <param name="Refnum">Bank RefNumber (Bank Token)</param>
+        /// <returns></returns>
+        public Task<ConfirmPaymentResponse> VerifyTransactionAsync(long Refnum)
+        {
+            return confirmServiceSoapClient.ConfirmPaymentAsync(new ClientConfirmRequestData()
+            {
+                LoginAccount = _Pin,
+                Token = Refnum
+            });
+        }
     }
 }

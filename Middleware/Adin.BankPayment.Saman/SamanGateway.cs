@@ -1,4 +1,5 @@
 ﻿using Adin.BankPayment.Saman.Connected_Services.SamanServiceNew;
+using System.Threading.Tasks;
 
 namespace Adin.BankPayment.Saman
 {
@@ -15,17 +16,15 @@ namespace Adin.BankPayment.Saman
             MID = samanMID;
             Password = password;
         }
-        
-        public double verifyTransaction(string refnum)
+
+        public Task<double> VerifyTransactionAsync(string Refnum)
         {
-            var result1 = _referencePaymentClient.verifyTransactionAsync(refnum, MID).Result;
-            return result1;
+            return _referencePaymentClient.verifyTransactionAsync(Refnum, MID);
         }
 
-        public double reverseTransaction(string refnum)
+        public Task<double> ReverseTransactionAsync(string Refnum)
         {
-            var result1 = _referencePaymentClient.reverseTransactionAsync(refnum, MID, MID, Password).Result;
-            return result1;
+            return _referencePaymentClient.reverseTransactionAsync(Refnum, MID, MID, Password);
         }
     }
 }

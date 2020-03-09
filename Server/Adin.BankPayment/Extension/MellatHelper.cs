@@ -44,13 +44,13 @@ namespace Adin.BankPayment.Extension
             var saleReferenceId = Convert.ToInt64(trans.BankTrackCode);
 
             var mellatGateway = new MellatGateway(terminalId, userName, password);
-            var verifyResult = (await mellatGateway.bpVerifyRequest(saleOrderId, saleReferenceId)).Body.@return;
+            var verifyResult = (await mellatGateway.BpVerifyRequest(saleOrderId, saleReferenceId)).Body.@return;
             var message = "تراکنش بازگشت داده شد";
             if (!string.IsNullOrEmpty(verifyResult))
             {
                 if (verifyResult == "0")
                 {
-                    var inquiryResult = (await mellatGateway.bpInquiryRequest(saleOrderId, saleReferenceId)).Body
+                    var inquiryResult = (await mellatGateway.BpInquiryRequest(saleOrderId, saleReferenceId)).Body
                         .@return;
                     if (inquiryResult == "0")
                     {
@@ -58,7 +58,7 @@ namespace Adin.BankPayment.Extension
                         //ViewBag.SaleReferenceId = SaleReferenceId;
                         // پرداخت نهایی
                         // تایید پرداخت
-                        var settleResult = (await mellatGateway.bpSettleRequest(saleOrderId, saleReferenceId)).Body
+                        var settleResult = (await mellatGateway.BpSettleRequest(saleOrderId, saleReferenceId)).Body
                             .@return;
                         if (settleResult != null)
                         {
@@ -102,7 +102,7 @@ namespace Adin.BankPayment.Extension
                     {
                         //string Rvresult;
                         //عملیات برگشت دادن مبلغ
-                        var result = (await mellatGateway.bpReversalRequest(saleOrderId, saleReferenceId)).Body.@return;
+                        var result = (await mellatGateway.BpReversalRequest(saleOrderId, saleReferenceId)).Body.@return;
                         message = "تراکنش بازگشت داده شد";
 
                         _logger.LogError("resultcode" + result);
