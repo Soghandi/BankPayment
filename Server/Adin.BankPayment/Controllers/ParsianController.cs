@@ -75,7 +75,7 @@ namespace Adin.BankPayment.Controllers
             catch (Exception ex)
             {
                 _errorMsg = ex.Message;
-                _logger.LogError(ex.Message);
+                _logger.LogError(_errorMsg);
             }
 
             transaction.Status = (byte)TransactionStatusEnum.Failed;

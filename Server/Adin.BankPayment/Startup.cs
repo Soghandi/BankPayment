@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Adin.BankPayment
@@ -47,12 +48,12 @@ namespace Adin.BankPayment
                 // Register the Swagger generator, defining one or more Swagger documents
                 services.AddSwaggerGen(options =>
                 {
-                    options.SwaggerDoc("v1", new Info
+                    options.SwaggerDoc("v1", new OpenApiInfo
                     {
                         Description = "BankPayment Api Guideline",
                         Title = "BankPayment API",
                         Version = "v1",
-                        TermsOfService = "License Reserved - 2018"
+                        TermsOfService = new Uri("https://github.com/Soghandi/BankPayment/blob/master/LICENSE")
                     });
 
                     options.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
@@ -71,9 +72,9 @@ namespace Adin.BankPayment
 
             SecretKey = Configuration.GetSection("SecretKey").Value;
             signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SecretKey));
-            
+
             ConnectionStringGetter.ConStr = Configuration.GetSection("ConnectionString").Value;
-            
+
             services.AddMemoryCache();
             services.AddMvc(e => e.EnableEndpointRouting = false);
         }

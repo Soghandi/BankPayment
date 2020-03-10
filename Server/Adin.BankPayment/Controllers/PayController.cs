@@ -33,6 +33,7 @@ namespace Adin.BankPayment.Controllers
         [HttpGet("/Pay/{id}")]
         public async Task<IActionResult> Index(Guid id)
         {
+            _logger.LogWarning("Pay - Id : " + id);
             var transaction = await _transactionRepository.Get(id);
             if (transaction == null ||
                 transaction.Status == (byte)TransactionStatusEnum.Cancel)
@@ -75,20 +76,21 @@ namespace Adin.BankPayment.Controllers
                     }
                     else
                     {
-                        _logger.LogInformation("Critical Error: Payment Error. StatusCode={0}", resp.Body.SalePaymentRequestResult.Status);
+                        _logger.LogInformation("Critical Error: Payment Error. StatusCode={0} - Message={1}", resp.Body.SalePaymentRequestResult.Status, ParsianErrors.GetResult(resp.Body.SalePaymentRequestResult.Status).Message);
                         transaction.BankTrackCode = resp.Body.SalePaymentRequestResult.Token.ToString();
                         switch (resp.Body.SalePaymentRequestResult.Status)
                         {
-                            case 20:
-                            case 22:
+                            case -126:
                                 transaction.ErrorCode = (byte)ErrorCodeEnum.InvalidPin;
                                 transaction.BankErrorMessage = "پين فروشنده درست نميباشد";
                                 break;
-                            case 30:
+                            case 2:
+                            case -1533:
+                            case -1536:
                                 transaction.ErrorCode = (byte)ErrorCodeEnum.OperationAlreadyDone;
                                 transaction.BankErrorMessage = "عمليات قبلا با موفقيت انجام شده است";
                                 break;
-                            case 34:
+                            case -112:
                                 transaction.ErrorCode = (byte)ErrorCodeEnum.UserTrackCodeIsInvalid;
                                 transaction.BankErrorMessage = "شماره تراكنش فروشنده درست نميباشد";
                                 break;

@@ -41,6 +41,8 @@ namespace Adin.BankPayment.Domain.Context
         {
             modelBuilder.Entity<Transaction>().Property(x => x.IsDeleted).HasDefaultValue(false);
             modelBuilder.Entity<Transaction>().HasQueryFilter(p => p.IsDeleted == false);
+            modelBuilder.Entity<Transaction>().Property(p => p.Amount).HasColumnType("decimal(18, 2)");
+
 
             modelBuilder.Entity<Bank>().Property(x => x.IsDeleted).HasDefaultValue(false);
             modelBuilder.Entity<Bank>().HasQueryFilter(p => p.IsDeleted == false);
