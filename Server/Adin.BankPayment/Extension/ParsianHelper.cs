@@ -44,7 +44,7 @@ namespace Adin.BankPayment.Extension
             if (result.Body.ConfirmPaymentResult.Status == 0 && result.Body.ConfirmPaymentResult.Token > 0)
             {
                 _logger.LogDebug("Verify Done");
-                var message = "بانک صحت رسيد ديجيتالي شما را تصديق نمود. فرايند خريد تکميل گشت";
+                var message = "بانک صحت رسید دیجیتالی شما را تصدیق نمود. فرایند خرید تکمیل گشت";
                 message += "<br/>" + " شماره رسید : " + transaction.BankTrackCode;
                 transaction.Status = (byte)TransactionStatusEnum.Success;
                 transaction.ModifiedOn = DateTime.Now;

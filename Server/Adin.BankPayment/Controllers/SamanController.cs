@@ -70,11 +70,11 @@ namespace Adin.BankPayment.Controllers
                         return Redirect(url3);
                     }
 
-                    _errorMsg = "متاسفانه بانک خريد شما را تاييد نکرده است";
+                    _errorMsg = "متاسفانه بانک خرید شما را تایید نکرده است";
                     if (_transactionState.Equals("CanceledByUser") || _transactionState.Equals(string.Empty))
                     {
                         // Transaction was canceled by user
-                        _errorMsg = "تراكنش توسط خريدار كنسل شد";
+                        _errorMsg = "تراكنش توسط خریدار كنسل شد";
                         bankErrorCode = ErrorCodeEnum.CanceledByUser;
                     }
                     //InvalidParameters
@@ -93,13 +93,13 @@ namespace Adin.BankPayment.Controllers
                     else if (_transactionState.Equals("InvalidTransaction"))
                     {
                         // Can not find teransaction
-                        _errorMsg = "تراکنش معتبر نمی باشد";
+                        _errorMsg = "تراکنش معتبر نیست";
                         bankErrorCode = ErrorCodeEnum.InvalidTransaction;
                     }
                     else if (_transactionState.Equals("InvalidCardNumber"))
                     {
                         // Card number is wrong
-                        _errorMsg = "شماره کارت معتبر نمی باشد";
+                        _errorMsg = "شماره کارت معتبر نیست";
                         bankErrorCode = ErrorCodeEnum.InvalidCardNumber;
                     }
                     else if (_transactionState.Equals("NoSuchIssuer"))
@@ -129,7 +129,7 @@ namespace Adin.BankPayment.Controllers
                     else if (_transactionState.Equals("ExceedsWithdrawalAmountLimit"))
                     {
                         // Exceeds withdrawal from amount limit
-                        _errorMsg = "پرداخت بیشتر از از حد مجاز می باشد";
+                        _errorMsg = "پرداخت بیشتر از از حد مجاز نیست";
                         bankErrorCode = ErrorCodeEnum.ExceedsWithdrawalAmountLimit;
                     }
                     else if (_transactionState.Equals("TransactionCannotBeCompleted"))
@@ -153,7 +153,7 @@ namespace Adin.BankPayment.Controllers
                     else if (_transactionState.Equals("NoSufficientFunds"))
                     {
                         // there are not suficient funds in the account
-                        _errorMsg = "موجودی کافی نمی باشد";
+                        _errorMsg = "موجودی کافی نیست";
                         bankErrorCode = ErrorCodeEnum.NoSufficientFunds;
                     }
                     else if (_transactionState.Equals("IssuerDownSlm"))
