@@ -96,7 +96,7 @@ namespace Adin.BankPayment.Controllers
                         }
 
                         await _transactionRepository.Update(transaction);
-                        return BadRequest(transaction.BankErrorMessage);
+                        return View("Error", transaction.BankErrorMessage);
                     }
 
                 case (byte)BankCodeEnum.Mellat:
@@ -129,7 +129,7 @@ namespace Adin.BankPayment.Controllers
                         transaction.BankErrorCode = Convert.ToInt32(resultArray[0]);
                         transaction.BankErrorMessage = MellatHelper.MellatResult(resultArray[0]);
                         await _transactionRepository.Update(transaction);
-                        return BadRequest(transaction.BankErrorMessage);
+                        return View("Error", transaction.BankErrorMessage);
                     }
                     else
                     {
@@ -137,7 +137,7 @@ namespace Adin.BankPayment.Controllers
 
                         transaction.BankErrorMessage = "امکان اتصال به درگاه بانک وجود ندارد";
                         await _transactionRepository.Update(transaction);
-                        return BadRequest(transaction.BankErrorMessage);
+                        return View("Error", transaction.BankErrorMessage);
                     }
 
                 case (byte)BankCodeEnum.Efarda:
