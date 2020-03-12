@@ -29,8 +29,8 @@
         InvalidTime = 23,
         InternalError = 24,
         VerifyError = 100,
-        InvalidPin = 200, //پين فروشنده درست نميباشد :
-        OperationAlreadyDone = 201, //عمليات قبلا با موفقيت انجام شده است
-        UserTrackCodeIsInvalid = 202 //شماره تراكنش فروشنده درست نميباشد        
+        InvalidPin = 200, //پین فروشنده درست نیست :
+        OperationAlreadyDone = 201, //عملیات قبلا با موفقیت انجام شده است
+        UserTrackCodeIsInvalid = 202 //شماره تراكنش فروشنده درست نیست        
     }
 }

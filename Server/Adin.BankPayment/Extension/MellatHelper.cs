@@ -67,7 +67,7 @@ namespace Adin.BankPayment.Extension
                                 //تراکنش تایید و ستل شده است 
                                 _logger.LogError("Verify Done!!!!!");
 
-                                message = "بانک صحت رسيد ديجيتالي شما را تصديق نمود. فرايند خريد تکميل گشت";
+                                message = "بانک صحت رسید دیجیتالی شما را تصدیق نمود. فرایند خرید تکمیل گشت";
                                 message += "<br/>" + " شماره رسید : " + transaction.BankTrackCode;
                                 transaction.Status = (byte) TransactionStatusEnum.Success;
                                 transaction.ModifiedOn = DateTime.Now;
@@ -84,7 +84,7 @@ namespace Adin.BankPayment.Extension
                             //تراکنش تایید شده ولی ستل نشده است                                
                             _logger.LogError("Verify Done!!!!!");
 
-                            message = "بانک صحت رسيد ديجيتالي شما را تصديق نمود. فرايند خريد تکميل گشت";
+                            message = "بانک صحت رسید دیجیتالی شما را تصدیق نمود. فرایند خرید تکمیل گشت";
                             message += "<br/>" + " شماره رسید : " + transaction.BankTrackCode;
                             transaction.Status = (byte) TransactionStatusEnum.WaitingForSettle;
                             transaction.ModifiedOn = DateTime.Now;
@@ -174,55 +174,55 @@ namespace Adin.BankPayment.Extension
                     result = "پرداخت لغو شده";
                     break;
                 case "0":
-                    result = "تراكنش با موفقيت انجام شد";
+                    result = "تراكنش با موفقیت انجام شد";
                     break;
                 case "11":
                     result = "شماره كارت نامعتبر است ";
                     break;
                 case "12":
-                    result = "موجودي كافي نيست ";
+                    result = "موجودی كافی نیست ";
                     break;
                 case "13":
                     result = "رمز نادرست است ";
                     break;
                 case "14":
-                    result = "تعداد دفعات وارد كردن رمز بيش از حد مجاز است ";
+                    result = "تعداد دفعات وارد كردن رمز بیش از حد مجاز است ";
                     break;
                 case "15":
                     result = "كارت نامعتبر است ";
                     break;
                 case "16":
-                    result = "دفعات برداشت وجه بيش از حد مجاز است ";
+                    result = "دفعات برداشت وجه بیش از حد مجاز است ";
                     break;
                 case "17":
                     result = "كاربر از انجام تراكنش منصرف شده است ";
                     break;
                 case "18":
-                    result = "تاريخ انقضاي كارت گذشته است ";
+                    result = "تاریخ انقضای كارت گذشته است ";
                     break;
                 case "19":
-                    result = "مبلغ برداشت وجه بيش از حد مجاز است ";
+                    result = "مبلغ برداشت وجه بیش از حد مجاز است ";
                     break;
                 case "111":
                     result = "صادر كننده كارت نامعتبر است ";
                     break;
                 case "112":
-                    result = "خطاي سوييچ صادر كننده كارت ";
+                    result = "خطای سوییچ صادر كننده كارت ";
                     break;
                 case "113":
-                    result = "پاسخي از صادر كننده كارت دريافت نشد ";
+                    result = "پاسخی از صادر كننده كارت دریافت نشد ";
                     break;
                 case "114":
-                    result = "دارنده كارت مجاز به انجام اين تراكنش نيست";
+                    result = "دارنده كارت مجاز به انجام این تراكنش نیست";
                     break;
                 case "21":
-                    result = "پذيرنده نامعتبر است ";
+                    result = "پذیرنده نامعتبر است ";
                     break;
                 case "23":
-                    result = "خطاي امنيتي رخ داده است ";
+                    result = "خطای امنیتی رخ داده است ";
                     break;
                 case "24":
-                    result = "اطلاعات كاربري پذيرنده نامعتبر است ";
+                    result = "اطلاعات كاربری پذیرنده نامعتبر است ";
                     break;
                 case "25":
                     result = "مبلغ نامعتبر است ";
@@ -231,28 +231,28 @@ namespace Adin.BankPayment.Extension
                     result = "پاسخ نامعتبر است ";
                     break;
                 case "32":
-                    result = "فرمت اطلاعات وارد شده صحيح نمي باشد ";
+                    result = "فرمت اطلاعات وارد شده صحیح نیست ";
                     break;
                 case "33":
                     result = "حساب نامعتبر است ";
                     break;
                 case "34":
-                    result = "خطاي سيستمي ";
+                    result = "خطای سیستمی ";
                     break;
                 case "35":
-                    result = "تاريخ نامعتبر است ";
+                    result = "تاریخ نامعتبر است ";
                     break;
                 case "41":
-                    result = "شماره درخواست تكراري است ، دوباره تلاش کنید";
+                    result = "شماره درخواست تكراری است ، دوباره تلاش کنید";
                     break;
                 case "42":
-                    result = "يافت نشد  Sale تراكنش";
+                    result = "یافت نشد  Sale تراكنش";
                     break;
                 case "43":
                     result = "داده شده است  Verify قبلا درخواست";
                     break;
                 case "44":
-                    result = "يافت نشد  Verfiy درخواست";
+                    result = "یافت نشد  Verfiy درخواست";
                     break;
                 case "45":
                     result = "شده است  Settle تراكنش";
@@ -261,13 +261,13 @@ namespace Adin.BankPayment.Extension
                     result = "نشده است  Settle تراكنش";
                     break;
                 case "47":
-                    result = "يافت نشد  Settle تراكنش";
+                    result = "یافت نشد  Settle تراكنش";
                     break;
                 case "48":
                     result = "شده است  Reverse تراكنش";
                     break;
                 case "49":
-                    result = "يافت نشد  Refund تراكنش";
+                    result = "یافت نشد  Refund تراكنش";
                     break;
                 case "412":
                     result = "شناسه قبض نادرست است ";
@@ -279,7 +279,7 @@ namespace Adin.BankPayment.Extension
                     result = "سازمان صادر كننده قبض نامعتبر است ";
                     break;
                 case "415":
-                    result = "زمان جلسه كاري به پايان رسيده است ";
+                    result = "زمان جلسه كاری به پایان رسیده است ";
                     break;
                 case "416":
                     result = "خطا در ثبت اطلاعات ";
@@ -288,7 +288,7 @@ namespace Adin.BankPayment.Extension
                     result = "شناسه پرداخت كننده نامعتبر است ";
                     break;
                 case "418":
-                    result = "اشكال در تعريف اطلاعات مشتري ";
+                    result = "اشكال در تعریف اطلاعات مشتری ";
                     break;
                 case "419":
                     result = "تعداد دفعات ورود اطلاعات از حد مجاز گذشته است ";
@@ -297,16 +297,16 @@ namespace Adin.BankPayment.Extension
                     result = "نامعتبر است  IP";
                     break;
                 case "51":
-                    result = "تراكنش تكراري است ";
+                    result = "تراكنش تكراری است ";
                     break;
                 case "54":
-                    result = "تراكنش مرجع موجود نيست ";
+                    result = "تراكنش مرجع موجود نیست ";
                     break;
                 case "55":
                     result = "تراكنش نامعتبر است ";
                     break;
                 case "61":
-                    result = "خطا در واريز ";
+                    result = "خطا در واریز ";
                     break;
                 default:
                     result = string.Empty;
@@ -326,14 +326,14 @@ namespace Adin.BankPayment.Extension
                     //result = "پرداخت لغو شده";
                     return ErrorCodeEnum.CanceledByUser;
                 case "0":
-                    //result = "تراكنش با موفقيت انجام شد";
+                    //result = "تراكنش با موفقیت انجام شد";
                     return ErrorCodeEnum.NoError;
                 case "11":
                     return ErrorCodeEnum.InvalidCardNumber;
                 //result = "شماره كارت نامعتبر است ";                    
                 case "12":
                     return ErrorCodeEnum.NoSufficientFunds;
-                //result = "موجودي كافي نيست ";                    
+                //result = "موجودی كافی نیست ";                    
                 case "13":
                     return ErrorCodeEnum.InvalidPassword;
                 //result = "رمز نادرست است ";
@@ -341,7 +341,7 @@ namespace Adin.BankPayment.Extension
                 case "14":
                     return ErrorCodeEnum.InvalidPassword;
 
-                //result = "تعداد دفعات وارد كردن رمز بيش از حد مجاز است ";
+                //result = "تعداد دفعات وارد كردن رمز بیش از حد مجاز است ";
                 //break;
                 case "15":
                     return ErrorCodeEnum.InvalidCardNumber;
@@ -350,7 +350,7 @@ namespace Adin.BankPayment.Extension
                 case "16":
                     return ErrorCodeEnum.ExceedsWithdrawalAmountLimit;
 
-                //result = "دفعات برداشت وجه بيش از حد مجاز است ";
+                //result = "دفعات برداشت وجه بیش از حد مجاز است ";
                 //break;
                 case "17":
                     return ErrorCodeEnum.CanceledByUser;
@@ -360,12 +360,12 @@ namespace Adin.BankPayment.Extension
                 case "18":
                     return ErrorCodeEnum.ExpiredCardPickUp;
 
-                //   result = "تاريخ انقضاي كارت گذشته است ";
+                //   result = "تاریخ انقضای كارت گذشته است ";
                 //  break;
                 case "19":
                     return ErrorCodeEnum.ExceedsWithdrawalAmountLimit;
 
-                //result = "مبلغ برداشت وجه بيش از حد مجاز است ";
+                //result = "مبلغ برداشت وجه بیش از حد مجاز است ";
                 //break;
                 case "111":
                     return ErrorCodeEnum.BankIssuerIsInvalid;
@@ -375,33 +375,33 @@ namespace Adin.BankPayment.Extension
                 case "112":
                     return ErrorCodeEnum.UnkownError;
 
-                //  result = "خطاي سوييچ صادر كننده كارت ";
+                //  result = "خطای سوییچ صادر كننده كارت ";
                 // break;
                 case "113":
                     return ErrorCodeEnum.UnkownError;
 
-                //result = "پاسخي از صادر كننده كارت دريافت نشد ";
+                //result = "پاسخی از صادر كننده كارت دریافت نشد ";
                 //break;
                 case "114":
                     return ErrorCodeEnum.AllowablePINTriesExceededPickUp;
 
 
-                //result = "دارنده كارت مجاز به انجام اين تراكنش نيست";
+                //result = "دارنده كارت مجاز به انجام این تراكنش نیست";
                 //break;
                 case "21":
                     return ErrorCodeEnum.UnkownError;
 
-                //result = "پذيرنده نامعتبر است ";
+                //result = "پذیرنده نامعتبر است ";
                 //break;
                 case "23":
                     return ErrorCodeEnum.UnkownError;
 
-                //result = "خطاي امنيتي رخ داده است ";
+                //result = "خطای امنیتی رخ داده است ";
                 //break;
                 case "24":
                     return ErrorCodeEnum.UnkownError;
 
-                //result = "اطلاعات كاربري پذيرنده نامعتبر است ";
+                //result = "اطلاعات كاربری پذیرنده نامعتبر است ";
                 //break;
                 case "25":
                     return ErrorCodeEnum.UnkownError;
@@ -416,7 +416,7 @@ namespace Adin.BankPayment.Extension
                 case "32":
                     return ErrorCodeEnum.UnkownError;
 
-                //result = "فرمت اطلاعات وارد شده صحيح نمي باشد ";
+                //result = "فرمت اطلاعات وارد شده صحیح نیست ";
                 //break;
                 case "33":
                     return ErrorCodeEnum.UnkownError;
@@ -426,22 +426,22 @@ namespace Adin.BankPayment.Extension
                 case "34":
                     return ErrorCodeEnum.InternalError;
 
-                //result = "خطاي سيستمي ";
+                //result = "خطای سیستمی ";
                 //break;
                 case "35":
                     return ErrorCodeEnum.InvalidDate;
 
-                //result = "تاريخ نامعتبر است ";
+                //result = "تاریخ نامعتبر است ";
                 //break;
                 case "41":
                     return ErrorCodeEnum.UnkownError;
 
-                //result = "شماره درخواست تكراري است ، دوباره تلاش کنید";
+                //result = "شماره درخواست تكراری است ، دوباره تلاش کنید";
                 //break;
                 case "42":
                     return ErrorCodeEnum.UnkownError;
 
-                //result = "يافت نشد  Sale تراكنش";
+                //result = "یافت نشد  Sale تراكنش";
                 //break;
                 case "43":
                     return ErrorCodeEnum.AlreadyVerified;
@@ -451,7 +451,7 @@ namespace Adin.BankPayment.Extension
                 case "44":
                     return ErrorCodeEnum.UnkownError;
 
-                //result = "يافت نشد  Verfiy درخواست";
+                //result = "یافت نشد  Verfiy درخواست";
                 //break;
                 case "45":
                     return ErrorCodeEnum.UnkownError;
@@ -466,7 +466,7 @@ namespace Adin.BankPayment.Extension
                 case "47":
                     return ErrorCodeEnum.UnkownError;
 
-                //result = "يافت نشد  Settle تراكنش";
+                //result = "یافت نشد  Settle تراكنش";
                 //break;
                 case "48":
                     return ErrorCodeEnum.UnkownError;
@@ -476,7 +476,7 @@ namespace Adin.BankPayment.Extension
                 case "49":
                     return ErrorCodeEnum.UnkownError;
 
-                //result = "يافت نشد  Refund تراكنش";
+                //result = "یافت نشد  Refund تراكنش";
                 //break;
                 case "412":
                     return ErrorCodeEnum.InvalidBillCode;
@@ -496,7 +496,7 @@ namespace Adin.BankPayment.Extension
                 case "415":
                     return ErrorCodeEnum.ResponseReceivedTooLate;
 
-                //result = "زمان جلسه كاري به پايان رسيده است ";
+                //result = "زمان جلسه كاری به پایان رسیده است ";
                 //break;
                 case "416":
                     return ErrorCodeEnum.UnkownError;
@@ -511,7 +511,7 @@ namespace Adin.BankPayment.Extension
                 case "418":
                     return ErrorCodeEnum.UnkownError;
 
-                //result = "اشكال در تعريف اطلاعات مشتري ";
+                //result = "اشكال در تعریف اطلاعات مشتری ";
                 //break;
                 case "419":
                     return ErrorCodeEnum.UnkownError;
@@ -527,12 +527,12 @@ namespace Adin.BankPayment.Extension
                 case "51":
                     return ErrorCodeEnum.OperationAlreadyDone;
 
-                //result = "تراكنش تكراري است ";
+                //result = "تراكنش تكراری است ";
                 //break;
                 case "54":
                     return ErrorCodeEnum.UnkownError;
 
-                //result = "تراكنش مرجع موجود نيست ";
+                //result = "تراكنش مرجع موجود نیست ";
                 //break;
                 case "55":
                     return ErrorCodeEnum.InvalidTransaction;
@@ -542,7 +542,7 @@ namespace Adin.BankPayment.Extension
                 case "61":
                     return ErrorCodeEnum.UnkownError;
 
-                //result = "خطا در واريز ";
+                //result = "خطا در واریز ";
                 //break;
                 default:
                     return ErrorCodeEnum.UnkownError;

@@ -51,7 +51,7 @@ namespace Adin.BankPayment.Extension
 
             if (traceNumber)
             {
-                message = "بانک صحت رسيد ديجيتالي شما را تصديق نمود. فرايند خريد تکميل گشت";
+                message = "بانک صحت رسید دیجیتالی شما را تصدیق نمود. فرایند خرید تکمیل گشت";
                 message += "<br/>" + " شماره رسید : " + transaction.BankTrackCode;
                 transaction.Status = (byte)TransactionStatusEnum.Success;
                 transaction.ModifiedOn = DateTime.Now;

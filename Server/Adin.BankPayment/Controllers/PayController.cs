@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Adin.BankPayment.Connector.Enum;
 using Adin.BankPayment.Domain.Model;
@@ -82,22 +81,22 @@ namespace Adin.BankPayment.Controllers
                         {
                             case -126:
                                 transaction.ErrorCode = (byte)ErrorCodeEnum.InvalidPin;
-                                transaction.BankErrorMessage = "پين فروشنده درست نميباشد";
+                                transaction.BankErrorMessage = "پین فروشنده درست نیست";
                                 break;
                             case 2:
                             case -1533:
                             case -1536:
                                 transaction.ErrorCode = (byte)ErrorCodeEnum.OperationAlreadyDone;
-                                transaction.BankErrorMessage = "عمليات قبلا با موفقيت انجام شده است";
+                                transaction.BankErrorMessage = "عملیات قبلا با موفقیت انجام شده است";
                                 break;
                             case -112:
                                 transaction.ErrorCode = (byte)ErrorCodeEnum.UserTrackCodeIsInvalid;
-                                transaction.BankErrorMessage = "شماره تراكنش فروشنده درست نميباشد";
+                                transaction.BankErrorMessage = "شماره تراكنش فروشنده درست نیست";
                                 break;
                         }
 
                         await _transactionRepository.Update(transaction);
-                        return BadRequest(transaction.BankErrorMessage);
+                        return View("Error", transaction.BankErrorMessage);
                     }
 
                 case (byte)BankCodeEnum.Mellat:
@@ -130,7 +129,7 @@ namespace Adin.BankPayment.Controllers
                         transaction.BankErrorCode = Convert.ToInt32(resultArray[0]);
                         transaction.BankErrorMessage = MellatHelper.MellatResult(resultArray[0]);
                         await _transactionRepository.Update(transaction);
-                        return BadRequest(transaction.BankErrorMessage);
+                        return View("Error", transaction.BankErrorMessage);
                     }
                     else
                     {
@@ -138,7 +137,7 @@ namespace Adin.BankPayment.Controllers
 
                         transaction.BankErrorMessage = "امکان اتصال به درگاه بانک وجود ندارد";
                         await _transactionRepository.Update(transaction);
-                        return BadRequest(transaction.BankErrorMessage);
+                        return View("Error", transaction.BankErrorMessage);
                     }
 
                 case (byte)BankCodeEnum.Efarda:
