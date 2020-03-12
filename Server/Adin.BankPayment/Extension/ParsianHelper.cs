@@ -32,12 +32,12 @@ namespace Adin.BankPayment.Extension
             var applicationBanks = await _applicationBankRepository.GetFirstBy(x =>
                 x.BankId == transaction.BankId && x.ApplicationId == transaction.ApplicationId);
             var ParsianParams = applicationBanks.ApplicationBankParams.ToList();
-            var midParam = ParsianParams.FirstOrDefault(x => x.ParamKey == "MID");
+            var pinParam = ParsianParams.FirstOrDefault(x => x.ParamKey == "ParsianPIN");
 
-            if (midParam == null)
+            if (pinParam == null)
                 return verifyTransactionResult;
 
-            var ParsianGateway = new ParsianGateway(midParam.ParamValue);
+            var ParsianGateway = new ParsianGateway(pinParam.ParamValue);
 
             var result = await ParsianGateway.VerifyTransactionAsync(Convert.ToInt64(transaction.BankTrackCode));
 
