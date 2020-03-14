@@ -60,6 +60,12 @@ namespace Adin.BankPayment.Controllers
             {
                 case (byte)BankCodeEnum.Parsian:
                     _logger.LogInformation("Parsian");
+                    if (!string.IsNullOrWhiteSpace(transaction.BankTrackCode))
+                    {
+                        var url = string.Format(applicationBank.Bank.PostUrl, transaction.BankTrackCode);
+                        return Redirect(url);
+                    }
+
                     var pinParam = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "ParsianPIN");
 
                     var parsianGateway = new ParsianGateway(pinParam.ParamValue);
@@ -68,9 +74,9 @@ namespace Adin.BankPayment.Controllers
                     if (resp.Body.SalePaymentRequestResult.Status == 0)
                     {
                         _logger.LogInformation("authority after callback", resp.Body.SalePaymentRequestResult.Token);
-                        var url = string.Format(applicationBank.Bank.PostUrl, resp.Body.SalePaymentRequestResult.Token);
                         transaction.BankTrackCode = resp.Body.SalePaymentRequestResult.Token.ToString();
                         await _transactionRepository.Update(transaction);
+                        var url = string.Format(applicationBank.Bank.PostUrl, transaction.BankTrackCode);
                         return Redirect(url);
                     }
                     else
