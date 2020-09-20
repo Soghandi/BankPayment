@@ -57,7 +57,6 @@ namespace Adin.BankPayment.Controllers
             return View(transaction);
         }
 
-        [HttpGet("/Pay/{id}")]
         public async Task<IActionResult> Go(Guid id)
         {
             _logger.LogDebug("Pay - Id : " + id);
