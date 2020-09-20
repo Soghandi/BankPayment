@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Adin.BankPayment.Domain.Context;
 using Adin.BankPayment.Domain.Model;
@@ -23,7 +24,7 @@ namespace Adin.BankPayment.Service
 
         public async Task<Transaction> Get(Guid id)
         {
-            return await entity.Include(x => x.Bank).FirstOrDefaultAsync(x => x.Id == id);
+            return await entity.Include(x => x.Bank).Include(x => x.Application).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<IEnumerable<Transaction>> GetAll()
