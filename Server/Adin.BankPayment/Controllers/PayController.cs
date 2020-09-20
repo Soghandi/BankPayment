@@ -32,7 +32,35 @@ namespace Adin.BankPayment.Controllers
         [HttpGet("/Pay/{id}")]
         public async Task<IActionResult> Index(Guid id)
         {
-            _logger.LogWarning("Pay - Id : " + id);
+            _logger.LogDebug("Pay - Id : " + id);
+            var transaction = await _transactionRepository.Get(id);
+            if (transaction == null ||
+                transaction.Status == (byte)TransactionStatusEnum.Cancel)
+                return View("Error", "لینک وارد شده صحیح نیست.");
+
+            if (transaction.Status == (byte)TransactionStatusEnum.Success ||
+                transaction.Status == (byte)TransactionStatusEnum.BankOk)
+                return View("Error", "این تراکنش قبلا پرداخت شده است.");
+
+            if (transaction.ExpirationTime.HasValue &&
+                transaction.ExpirationTime < DateTime.Now)
+            {
+                var persianCalendar = new PersianCalendar();
+                var date =
+                    $"{persianCalendar.GetYear(transaction.ExpirationTime.Value)}/{persianCalendar.GetMonth(transaction.ExpirationTime.Value)}/" +
+                    $"{persianCalendar.GetDayOfMonth(transaction.ExpirationTime.Value)}" +
+                    $" - {transaction.ExpirationTime.Value.Hour}:{transaction.ExpirationTime.Value.Minute}";
+                return View("Error",
+                    $"این لینک تا تاریخ {date} معتبر بوده است، لطفا از پشتیبانی تقاضای لینک جدید بفرمایید.");
+            }
+
+            return View(transaction);
+        }
+
+        [HttpGet("/Pay/{id}")]
+        public async Task<IActionResult> Go(Guid id)
+        {
+            _logger.LogDebug("Pay - Id : " + id);
             var transaction = await _transactionRepository.Get(id);
             if (transaction == null ||
                 transaction.Status == (byte)TransactionStatusEnum.Cancel)
@@ -59,7 +87,7 @@ namespace Adin.BankPayment.Controllers
             switch (transaction.Bank.Code)
             {
                 case (byte)BankCodeEnum.Parsian:
-                    _logger.LogInformation("Parsian");
+                    _logger.LogDebug("Parsian");
                     if (!string.IsNullOrWhiteSpace(transaction.BankTrackCode))
                     {
                         var url = string.Format(applicationBank.Bank.PostUrl, transaction.BankTrackCode);
@@ -73,7 +101,7 @@ namespace Adin.BankPayment.Controllers
                         Convert.ToInt64(transaction.UserTrackCode), transaction.BankRedirectUrl, transaction.Id.ToString());
                     if (resp.Body.SalePaymentRequestResult.Status == 0)
                     {
-                        _logger.LogInformation("authority after callback", resp.Body.SalePaymentRequestResult.Token);
+                        _logger.LogDebug("authority after callback", resp.Body.SalePaymentRequestResult.Token);
                         transaction.BankTrackCode = resp.Body.SalePaymentRequestResult.Token.ToString();
                         await _transactionRepository.Update(transaction);
                         var url = string.Format(applicationBank.Bank.PostUrl, transaction.BankTrackCode);
@@ -81,7 +109,7 @@ namespace Adin.BankPayment.Controllers
                     }
                     else
                     {
-                        _logger.LogInformation("Critical Error: Payment Error. StatusCode={0} - Message={1}", resp.Body.SalePaymentRequestResult.Status, ParsianErrors.GetResult(resp.Body.SalePaymentRequestResult.Status).Message);
+                        _logger.LogDebug("Critical Error: Payment Error. StatusCode={0} - Message={1}", resp.Body.SalePaymentRequestResult.Status, ParsianErrors.GetResult(resp.Body.SalePaymentRequestResult.Status).Message);
                         transaction.BankTrackCode = resp.Body.SalePaymentRequestResult.Token.ToString();
                         switch (resp.Body.SalePaymentRequestResult.Status)
                         {
@@ -106,7 +134,7 @@ namespace Adin.BankPayment.Controllers
                     }
 
                 case (byte)BankCodeEnum.Mellat:
-                    _logger.LogInformation("mellat");
+                    _logger.LogDebug("mellat");
                     var terminalParam = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatTerminalId");
                     var userNameParam = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatUserName");
                     var passwordParam = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "MellatPassword");
@@ -147,7 +175,7 @@ namespace Adin.BankPayment.Controllers
                     }
 
                 case (byte)BankCodeEnum.Efarda:
-                    _logger.LogInformation("Efarda");
+                    _logger.LogDebug("Efarda");
 
                     var EfardaServiceId =
                        applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "serviceId");
@@ -169,7 +197,7 @@ namespace Adin.BankPayment.Controllers
 
                 case (byte)BankCodeEnum.Saman:
                 default:
-                    _logger.LogInformation("Saman");
+                    _logger.LogDebug("Saman");
                     ViewBag.Params = applicationBank.ApplicationBankParams.ToList();
                     return View("Saman", transaction);
             }
