@@ -1,6 +1,6 @@
 ﻿@model Transaction
 @{
-    ViewData["Title"] = "BadRequest";
+    ViewData["Title"] = "تایید پرداحت";
 }
 <html>
 <head>
@@ -11,12 +11,11 @@
     <div class="container-fluid" style="margin: 20px auto; align-self: center; width: auto; text-align: center;">
         <div class="alert alert-info" role="alert">
             <p>
-                برای پرداخت مبلغ @Model.Amount به حساب @Model.Application.Title بر روی پرداخت کلیک کنید.
+                برای پرداخت مبلغ @Model.Amount.ToString("###,###,###,##0 ریال") 
+                به حساب @Model.Application.Title بر روی پرداخت کلیک کنید.
             </p>
-            <form method="post" asp-action="Go">
-                <input type="hidden" value="@Model.Id" />
-                <button type="submit" class="btn btn-success">پرداخت</button>
-            </form>
+            <a href="/Pay/Go/@Model.Id" class="btn btn-success">پرداخت</a>
+
         </div>
     </div>
 
