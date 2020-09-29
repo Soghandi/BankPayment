@@ -44,7 +44,7 @@ namespace Adin.BankPayment.Controllers
             var bankErrorCode = ErrorCodeEnum.UnkownError;
             try
             {
-                (bool Success, string Message) = EfardaErrors.GetResult(int.Parse(result));
+                (bool Success, string Message) = EfardaErrors.GetResult(result);
 
                 if (Success)
                 {

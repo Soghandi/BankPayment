@@ -45,6 +45,8 @@ namespace Adin.BankPayment.Efarda
                     Encoding.UTF8,
                     "application/json");
 
+                _logger.LogDebug("JsonSerializer.Serialize(getTraceModel):" + JsonSerializer.Serialize(getTraceModel));
+
                 var result = await httpClient.PostAsync($"{BaseUrl}/ipg/getTraceId", content);
                 if (result.IsSuccessStatusCode)
                 {
@@ -58,7 +60,7 @@ namespace Adin.BankPayment.Efarda
                     }
                     else
                     {
-                        _logger.LogWarning($"EfardaGateway - GetTraceId - Not successful - {Message}");
+                        _logger.LogWarning($"EfardaGateway - GetTraceId - Not successful - {Message} + result code :{getTraceResult?.result}");
                     }
                 }
             }

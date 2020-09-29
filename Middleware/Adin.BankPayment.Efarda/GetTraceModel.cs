@@ -26,7 +26,7 @@ namespace Adin.BankPayment.Efarda
     public class EfardaGetTraceResultModel
     {
         public string traceNumber { get; set; }
-        public int result { get; set; }
+        public string result { get; set; }
         public string description { get; set; }
         public string doTime { get; set; }
     }
@@ -40,13 +40,13 @@ namespace Adin.BankPayment.Efarda
 
     public class EfardaVerifyResultModel
     {
-        public int result { get; set; }
+        public string result { get; set; }
         public string description { get; set; }
         public string doTime { get; set; }
         public string traceNumber { get; set; }
         public string amount { get; set; }
         public string rrn { get; set; }
         public string type { get; set; }
-        public List<EfardaServiceamountlist> serviceAmountList { get; set; }
+        public EfardaServiceamountlist[] EfardaServiceamountlist { get; set; }
     }
 }
