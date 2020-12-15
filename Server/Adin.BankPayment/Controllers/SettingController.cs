@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Adin.BankPayment.Connector.Enum;
+﻿using Adin.BankPayment.Connector.Enum;
 using Adin.BankPayment.Domain.Enum;
 using Adin.BankPayment.Domain.Model;
 using Adin.BankPayment.Service;
@@ -9,6 +6,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Adin.BankPayment.Controllers
 {
@@ -89,13 +89,15 @@ namespace Adin.BankPayment.Controllers
                         CreationDate = DateTime.Now
                     };
                     await _applicationBankRepository.Add(applicationBank);
-                    var applicationBankParam = new ApplicationBankParam();
-                    applicationBankParam.CreatedBy = 1;
-                    applicationBankParam.CreationDate = DateTime.Now;
-                    applicationBankParam.ParamKey = "MID";
-                    applicationBankParam.ParamValue = MID;
-                    applicationBankParam.Status = 0;
-                    applicationBankParam.ApplicationBankId = applicationBank.Id;
+                    var applicationBankParam = new ApplicationBankParam
+                    {
+                        CreatedBy = 1,
+                        CreationDate = DateTime.Now,
+                        ParamKey = "MID",
+                        ParamValue = MID,
+                        Status = 0,
+                        ApplicationBankId = applicationBank.Id
+                    };
                     await _applicationBankParamRepository.Add(applicationBankParam);
                     return Ok();
                 }
@@ -135,13 +137,15 @@ namespace Adin.BankPayment.Controllers
                         CreationDate = DateTime.Now
                     };
                     await _applicationBankRepository.Add(applicationBank);
-                    var applicationBankParam = new ApplicationBankParam();
-                    applicationBankParam.CreatedBy = 1;
-                    applicationBankParam.CreationDate = DateTime.Now;
-                    applicationBankParam.ParamKey = "ParsianPIN";
-                    applicationBankParam.ParamValue = Pin;
-                    applicationBankParam.Status = 0;
-                    applicationBankParam.ApplicationBankId = applicationBank.Id;
+                    var applicationBankParam = new ApplicationBankParam
+                    {
+                        CreatedBy = 1,
+                        CreationDate = DateTime.Now,
+                        ParamKey = "ParsianPIN",
+                        ParamValue = Pin,
+                        Status = 0,
+                        ApplicationBankId = applicationBank.Id
+                    };
                     await _applicationBankParamRepository.Add(applicationBankParam);
                     return Ok();
                 }
@@ -239,7 +243,7 @@ namespace Adin.BankPayment.Controllers
             }
         }
 
-         [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> SetEfardaParams(string publicKey, string serviceId, string userName, string password)
         {
             try

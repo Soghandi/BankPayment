@@ -1,9 +1,4 @@
-﻿using System;
-using System.Security.Claims;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using Adin.BankPayment.Domain.Cache;
+﻿using Adin.BankPayment.Domain.Cache;
 using Adin.BankPayment.Domain.Context;
 using Adin.BankPayment.Domain.Model;
 using Adin.BankPayment.Service;
@@ -17,7 +12,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.Swagger;
+using System;
+using System.Security.Claims;
+using System.Security.Principal;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Adin.BankPayment
 {
@@ -69,6 +68,8 @@ namespace Adin.BankPayment
             services.AddTransient<IRepository<ApplicationBank>, ApplicationBankRepository>();
             services.AddTransient<IRepository<ApplicationBankParam>, ApplicationBankParamRepository>();
             services.AddTransient<IRepository<Bank>, BankRepository>();
+
+            services.AddHttpClient();
 
             SecretKey = Configuration.GetSection("SecretKey").Value;
             signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SecretKey));

@@ -4,19 +4,20 @@ using System.Web;
 using Adin.BankPayment.Connector.Enum;
 using Adin.BankPayment.Domain.Model;
 using Adin.BankPayment.Efarda;
+using Adin.BankPayment.Pasargad;
 using Adin.BankPayment.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace Adin.BankPayment.Controllers
 {
-    public class EfardaController : Controller
+    public class PasargadController : Controller
     {
-        private readonly ILogger<EfardaController> _logger;
+        private readonly ILogger<PasargadController> _logger;
         private readonly IRepository<Transaction> _transactionRepository;
         private string _errorMsg = "";
 
-        public EfardaController(ILogger<EfardaController> logger,
+        public PasargadController(ILogger<PasargadController> logger,
             IRepository<Transaction> transactionRepository)
         {
             _logger = logger;
@@ -24,13 +25,23 @@ namespace Adin.BankPayment.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Callback(string token, string secondTrackCode)
+        public async Task<IActionResult> Callback(string InvoiceNumber, string InvoiceDate, string TransactionReferenceID)
         {
-            var transaction = await _transactionRepository.Get(Guid.Parse(secondTrackCode));
+            var transaction = await _transactionRepository.GetFirstBy(a => a.UserTrackCode == InvoiceNumber && a.CreationDate.ToString() == InvoiceDate);
 
             if (transaction.Status == (byte)TransactionStatusEnum.Success ||
                 transaction.Status == (byte)TransactionStatusEnum.Cancel)
                 return BadRequest();
+
+
+            var merchantCode =
+                      applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "merchantCode");
+            var terminalCode =
+                applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "terminalCode");
+            var privateKey =
+                applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "privateKey");
+
+            var pasargadGateway = new PasargadGateway(_logger, merchantCode.ParamValue, terminalCode.ParamValue, privateKey.ParamValue);
 
             var longUrl = transaction.CallbackUrl;
             var uriBuilder = new UriBuilder(longUrl);
