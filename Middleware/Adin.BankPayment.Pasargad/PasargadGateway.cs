@@ -92,7 +92,7 @@ namespace Adin.BankPayment.Pasargad
                     var getTraceResult = JsonSerializer.Deserialize<CheckTransactionResultResponseModel>(await result.Content.ReadAsStringAsync());
 
                     return getTraceResult;
-                }               
+                }
             }
             catch (Exception ex)
             {
@@ -136,7 +136,7 @@ namespace Adin.BankPayment.Pasargad
             };
         }
 
-        public async Task<bool> Verify(string userTrackCode, int amount, DateTime InvoiceDate)
+        public async Task<(bool IsSuccess, string Message)> Verify(string userTrackCode, int amount, DateTime InvoiceDate)
         {
             try
             {
@@ -168,11 +168,12 @@ namespace Adin.BankPayment.Pasargad
 
                     if (Success)
                     {
-                        return Success;
+                        return (Success, Message);
                     }
                     else
                     {
                         _logger.LogWarning($"EfardaGateway - Verify - Not successful - Message: {Message}");
+                        return (Success, Message);
                     }
                 }
             }
@@ -180,7 +181,7 @@ namespace Adin.BankPayment.Pasargad
             {
                 _logger.LogError(ex, "EfardaGateway - Verify - Failed");
             }
-            return false;
+            return (false, "Failed");
         }
 
         private string GetSign(string PostBodyJson)

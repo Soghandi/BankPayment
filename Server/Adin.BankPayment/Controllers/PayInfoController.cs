@@ -82,6 +82,10 @@ namespace Adin.BankPayment.Controllers
                         transaction.BankRedirectUrl = $"{currentBaseUrl}/Efarda/Callback?token={model.TrackCode}&SecondTrackCode={transaction.Id}";
                         break;
 
+                    case BankCodeEnum.Pasargad:
+                        transaction.BankRedirectUrl = $"{currentBaseUrl}/Pasargad/Callback?token={model.TrackCode}&SecondTrackCode={transaction.Id}";
+                        break;
+
                     case BankCodeEnum.Saman:
                     default:
                         transaction.BankRedirectUrl = $"{currentBaseUrl}/Saman/Callback?token={model.TrackCode}&SecondTrackCode={transaction.Id}";

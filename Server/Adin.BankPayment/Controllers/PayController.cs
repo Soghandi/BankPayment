@@ -177,12 +177,9 @@ namespace Adin.BankPayment.Controllers
                 case (byte)BankCodeEnum.Efarda:
                     _logger.LogDebug("Efarda");
 
-                    var EfardaServiceId =
-                       applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "serviceId");
-                    var EfardaUsername =
-                        applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "userName");
-                    var EfardaPassword =
-                        applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "password");
+                    var EfardaServiceId = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "serviceId");
+                    var EfardaUsername = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "userName");
+                    var EfardaPassword = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "password");
 
                     EfardaGateway efardaGateway = new EfardaGateway(_logger, EfardaUsername.ParamValue, EfardaPassword.ParamValue, EfardaServiceId.ParamValue);
                     var traceNumber = await efardaGateway.GetTraceId(transaction.UserTrackCode, transaction.Amount.ToString("###############0"), transaction.BankRedirectUrl, transaction.Mobile.HasValue ? transaction.Mobile.Value.ToString() : string.Empty);
@@ -199,12 +196,9 @@ namespace Adin.BankPayment.Controllers
                 case (byte)BankCodeEnum.Pasargad:
                     _logger.LogDebug("Pasargad");
 
-                    var merchantCode =
-                       applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "merchantCode");
-                    var terminalCode =
-                        applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "terminalCode");
-                    var privateKey =
-                        applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "privateKey");
+                    var merchantCode = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "merchantCode");
+                    var terminalCode = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "terminalCode");
+                    var privateKey = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "privateKey");
 
                     var pasargadGateway = new PasargadGateway(_logger, merchantCode.ParamValue, terminalCode.ParamValue, privateKey.ParamValue);
 
