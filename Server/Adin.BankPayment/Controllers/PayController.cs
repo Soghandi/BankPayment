@@ -208,8 +208,6 @@ namespace Adin.BankPayment.Controllers
                     transaction.BankTrackCode = Token;
                     await _transactionRepository.Update(transaction);
 
-                    ViewBag.Token = Token;
-
                     return View("Pasargad", transaction);
 
 

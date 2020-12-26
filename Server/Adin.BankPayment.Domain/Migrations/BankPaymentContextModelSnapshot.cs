@@ -209,7 +209,7 @@ namespace Adin.BankPayment.Domain.Migrations
                         CreatedBy = 1,
                         CreationDate = new DateTime(2020, 8, 6, 19, 24, 49, 525, DateTimeKind.Local),
                         IsDeleted = false,
-                        PostUrl = "",
+                        PostUrl = "https://pf.efarda.ir/pf/api/ipg/purchase",
                         Status = (byte)0,
                         Title = "ارتباط فردا"
                     },

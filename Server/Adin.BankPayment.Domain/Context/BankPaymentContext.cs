@@ -100,6 +100,17 @@ namespace Adin.BankPayment.Domain.Context
                     Title = "تجارت الکترونیکی ارتباط فردا",
                     Id = Guid.Parse("8c4d3794-983f-4610-bf88-abe8db1ad07d"),
                     Status = 0
+                },
+                new Bank
+                {
+                    Code = 5,
+                    CreatedBy = 1,
+                    CreationDate = DateTime.Now,
+                    IsDeleted = false,
+                    PostUrl = "https://pep.shaparak.ir/payment.aspx",
+                    Status = (byte)0,
+                    Title = "پاسارگاد",
+                    Id = new Guid("e147830f-696d-4c4a-a7b4-b20722dd3ff6")
                 });
         }
     }

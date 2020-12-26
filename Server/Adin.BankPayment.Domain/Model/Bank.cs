@@ -6,7 +6,7 @@ namespace Adin.BankPayment.Domain.Model
     [Table("Bank")]
     public class Bank : BaseEntity
     {
-        [StringLength(16)]
+        [StringLength(64)]
         public string Title { get; set; }
 
         [StringLength(64)]

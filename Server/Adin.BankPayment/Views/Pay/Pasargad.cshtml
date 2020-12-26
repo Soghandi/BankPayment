@@ -9,7 +9,7 @@
 <body style="display:flex">
 
     <form method="post" action="@Model.Bank.PostUrl" id="frmSendToBank">
-        <input type="hidden" name="Token" value="@ViewBag.Token">
+        <input type="hidden" name="Token" value="@Model.BankTrackCode">
     </form>
 
     <div style="margin: 0 auto; align-self: center;" class="alert alert-success movetopage">
