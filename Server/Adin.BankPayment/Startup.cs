@@ -1,9 +1,4 @@
-﻿using System;
-using System.Security.Claims;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using Adin.BankPayment.Domain.Cache;
+﻿using Adin.BankPayment.Domain.Cache;
 using Adin.BankPayment.Domain.Context;
 using Adin.BankPayment.Domain.Model;
 using Adin.BankPayment.Service;
@@ -17,7 +12,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.Swagger;
+using System;
+using System.Security.Claims;
+using System.Security.Principal;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Adin.BankPayment
 {
@@ -36,16 +35,17 @@ namespace Adin.BankPayment
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             ConfigureAuthService(services);
             var connection = Configuration["ConnectionString"];
-            services.AddDbContext<BankPaymentContext>(options => options.UseSqlServer(connection));
+
+            ConnectionStringGetter.ConStr = connection;
+
+            services.AddDbContext<BankPaymentContext>(options => options.UseSqlServer(ConnectionStringGetter.ConStr, b => b.MigrationsAssembly("Adin.BankPayment")));
 
             try
             {
-                // Register the Swagger generator, defining one or more Swagger documents
                 services.AddSwaggerGen(options =>
                 {
                     options.SwaggerDoc("v1", new OpenApiInfo
@@ -70,10 +70,10 @@ namespace Adin.BankPayment
             services.AddTransient<IRepository<ApplicationBankParam>, ApplicationBankParamRepository>();
             services.AddTransient<IRepository<Bank>, BankRepository>();
 
+            services.AddHttpClient();
+
             SecretKey = Configuration.GetSection("SecretKey").Value;
             signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(SecretKey));
-
-            ConnectionStringGetter.ConStr = Configuration.GetSection("ConnectionString").Value;
 
             services.AddMemoryCache();
             services.AddMvc(e => e.EnableEndpointRouting = false);
@@ -108,7 +108,7 @@ namespace Adin.BankPayment
             var res = userValidator.Validate(publicKey);
             if (res != null)
                 return Task.FromResult(new ClaimsIdentity(new GenericIdentity(res.Id.ToString(), "Token"),
-                    new Claim[] { }));
+                    Array.Empty<Claim>()));
             // Credentials are invalid, or account doesn't exist
             return Task.FromResult<ClaimsIdentity>(null);
         }

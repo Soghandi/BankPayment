@@ -171,23 +171,59 @@ namespace Adin.BankPayment.Domain.Migrations
                 b.HasData(
                     new
                     {
-                        Id = new Guid("482a591e-7536-4f47-a544-e9d4342586bd"), Code = (byte) 1, CreatedBy = 1,
-                        CreationDate = new DateTime(2018, 8, 6, 19, 24, 49, 523, DateTimeKind.Local), IsDeleted = false,
-                        PostUrl = "https://sep.shaparak.ir/MobilePG/MobilePayment", Status = (byte) 0, Title = "سامان"
+                        Id = new Guid("482a591e-7536-4f47-a544-e9d4342586bd"),
+                        Code = (byte)1,
+                        CreatedBy = 1,
+                        CreationDate = new DateTime(2018, 8, 6, 19, 24, 49, 523, DateTimeKind.Local),
+                        IsDeleted = false,
+                        PostUrl = "https://sep.shaparak.ir/MobilePG/MobilePayment",
+                        Status = (byte)0,
+                        Title = "سامان"
                     },
                     new
                     {
-                        Id = new Guid("ab3f226a-be56-4092-bbd0-2ae8ffbce131"), Code = (byte) 2, CreatedBy = 1,
-                        CreationDate = new DateTime(2018, 8, 6, 19, 24, 49, 525, DateTimeKind.Local), IsDeleted = false,
-                        PostUrl = "https://pec.shaparak.ir/pecpaymentgateway/default.aspx?au={0}", Status = (byte) 0,
+                        Id = new Guid("ab3f226a-be56-4092-bbd0-2ae8ffbce131"),
+                        Code = (byte)2,
+                        CreatedBy = 1,
+                        CreationDate = new DateTime(2018, 8, 6, 19, 24, 49, 525, DateTimeKind.Local),
+                        IsDeleted = false,
+                        PostUrl = "https://pec.shaparak.ir/pecpaymentgateway/default.aspx?au={0}",
+                        Status = (byte)0,
                         Title = "پارسیان"
                     },
                     new
                     {
-                        Id = new Guid("98504148-3d89-4abb-9fb5-281bed8714e3"), Code = (byte) 3, CreatedBy = 1,
-                        CreationDate = new DateTime(2018, 8, 6, 19, 24, 49, 525, DateTimeKind.Local), IsDeleted = false,
-                        PostUrl = "https://bpm.shaparak.ir/pgwchannel/startpay.mellat", Status = (byte) 0, Title = "ملت"
-                    }
+                        Id = new Guid("98504148-3d89-4abb-9fb5-281bed8714e3"),
+                        Code = (byte)3,
+                        CreatedBy = 1,
+                        CreationDate = new DateTime(2018, 8, 6, 19, 24, 49, 525, DateTimeKind.Local),
+                        IsDeleted = false,
+                        PostUrl = "https://bpm.shaparak.ir/pgwchannel/startpay.mellat",
+                        Status = (byte)0,
+                        Title = "ملت"
+                    },
+                    new
+                    {
+                        Id = new Guid("e8d935f6-1c3d-4e4c-a74a-e2a569671197"),
+                        Code = (byte)4,
+                        CreatedBy = 1,
+                        CreationDate = new DateTime(2020, 8, 6, 19, 24, 49, 525, DateTimeKind.Local),
+                        IsDeleted = false,
+                        PostUrl = "https://pf.efarda.ir/pf/api/ipg/purchase",
+                        Status = (byte)0,
+                        Title = "ارتباط فردا"
+                    },
+                    new
+                    {
+                        Id = new Guid("e147830f-696d-4c4a-a7b4-b20722dd3ff6"),
+                        Code = (byte)5,
+                        CreatedBy = 1,
+                        CreationDate = new DateTime(2020, 8, 6, 19, 24, 49, 525, DateTimeKind.Local),
+                        IsDeleted = false,
+                        PostUrl = "https://pep.shaparak.ir/payment.aspx",
+                        Status = (byte)0,
+                        Title = "پاسارگاد"
+                    }                    
                 );
             });
 

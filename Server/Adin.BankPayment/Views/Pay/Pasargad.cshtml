@@ -1,0 +1,24 @@
+﻿@model Transaction
+@{
+    Layout = null;
+}
+<html>
+<head>
+    <link href="~/css/bootstrap.css" rel="stylesheet" />
+</head>
+<body style="display:flex">
+
+    <form method="post" action="@Model.Bank.PostUrl" id="frmSendToBank">
+        <input type="hidden" name="Token" value="@Model.BankTrackCode">
+    </form>
+
+    <div style="margin: 0 auto; align-self: center;" class="alert alert-success movetopage">
+        در حال انتقال به درگاه پرداخت ...
+    </div>
+
+    <script type="text/javascript">
+        document.getElementById("frmSendToBank").submit();
+    </script>
+
+</body>
+</html>

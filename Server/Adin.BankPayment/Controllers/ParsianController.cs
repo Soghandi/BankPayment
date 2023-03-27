@@ -12,12 +12,11 @@ namespace Adin.BankPayment.Controllers
 {
     public class ParsianController : Controller
     {
-        private readonly ILogger<SamanController> _logger;
+        private readonly ILogger<ParsianController> _logger;
         private readonly IRepository<Transaction> _transactionRepository;
         private string _errorMsg = "";
-        private string _transactionState = string.Empty;
 
-        public ParsianController(ILogger<SamanController> logger,
+        public ParsianController(ILogger<ParsianController> logger,
             IRepository<Transaction> transactionRepository)
         {
             _logger = logger;
@@ -27,13 +26,13 @@ namespace Adin.BankPayment.Controllers
         [HttpPost]
         public async Task<IActionResult> Callback(long token, string secondTrackCode)
         {
-            long FormToken = Convert.ToInt64(Request.Form["Token"]);
+            //long FormToken = Convert.ToInt64(Request.Form["Token"]);
             var Status = Request.Form["status"];
-            var OrderId = Request.Form["OrderId"];
-            var TerminalNo = Request.Form["TerminalNo"];
-            var RRN = Request.Form["RRN"];
-            var HashCardNumber = Request.Form["HashCardNumber"];
-            var Amount = Request.Form["Amount"];
+            //var OrderId = Request.Form["OrderId"];
+            //var TerminalNo = Request.Form["TerminalNo"];
+            //var RRN = Request.Form["RRN"];
+            //var HashCardNumber = Request.Form["HashCardNumber"];
+            //var Amount = Request.Form["Amount"];
 
             var transaction = await _transactionRepository.Get(Guid.Parse(secondTrackCode));
 

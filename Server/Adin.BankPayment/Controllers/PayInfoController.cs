@@ -17,11 +17,11 @@ namespace Adin.BankPayment.Controllers
     {
         private readonly IRepository<ApplicationBank> _applicationBankRepository;
         private readonly IRepository<Bank> _bankRepository;
-        private readonly ILogger<PayController> _logger;
+        private readonly ILogger<PayInfoController> _logger;
         private readonly IRepository<Transaction> _transactionRepository;
 
         public PayInfoController(IMemoryCache memCaches,
-            ILogger<PayController> logger,
+            ILogger<PayInfoController> logger,
             IRepository<Transaction> transactionRepository,
             IRepository<Application> applicationRepository,
             IRepository<Bank> bankRepository,
@@ -80,6 +80,10 @@ namespace Adin.BankPayment.Controllers
 
                     case BankCodeEnum.Efarda:
                         transaction.BankRedirectUrl = $"{currentBaseUrl}/Efarda/Callback?token={model.TrackCode}&SecondTrackCode={transaction.Id}";
+                        break;
+
+                    case BankCodeEnum.Pasargad:
+                        transaction.BankRedirectUrl = $"{currentBaseUrl}/Pasargad/Callback?token={model.TrackCode}&SecondTrackCode={transaction.Id}";
                         break;
 
                     case BankCodeEnum.Saman:

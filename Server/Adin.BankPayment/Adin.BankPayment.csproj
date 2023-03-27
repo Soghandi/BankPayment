@@ -27,6 +27,7 @@
     <ProjectReference Include="..\..\Middleware\Adin.BankPayment.Efarda\Adin.BankPayment.Efarda.csproj" />
     <ProjectReference Include="..\..\Middleware\Adin.BankPayment.Mellat\Adin.BankPayment.Mellat.csproj" />
     <ProjectReference Include="..\..\Middleware\Adin.BankPayment.Parsian\Adin.BankPayment.Parsian.csproj" />
+    <ProjectReference Include="..\..\Middleware\Adin.BankPayment.Pasargad\Adin.BankPayment.Pasargad.csproj" />
     <ProjectReference Include="..\..\Middleware\Adin.BankPayment.Saman\Adin.BankPayment.Saman.csproj" />
     <ProjectReference Include="..\..\Security\Adin.BankPayment.TokenProvider\Adin.BankPayment.TokenProvider.csproj" />
     <ProjectReference Include="..\Adin.BankPayment.Connector\Adin.BankPayment.Connector.csproj" />
@@ -37,6 +38,9 @@
   <ItemGroup>
     <Content Update="nlog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Views\Pay\Pasargad.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Views\Pay\Failure.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>

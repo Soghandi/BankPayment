@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Adin.BankPayment.Connector.Enum;
+﻿using Adin.BankPayment.Connector.Enum;
 using Adin.BankPayment.Domain.Enum;
 using Adin.BankPayment.Domain.Model;
 using Adin.BankPayment.Service;
@@ -9,6 +6,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Adin.BankPayment.Controllers
 {
@@ -89,13 +89,15 @@ namespace Adin.BankPayment.Controllers
                         CreationDate = DateTime.Now
                     };
                     await _applicationBankRepository.Add(applicationBank);
-                    var applicationBankParam = new ApplicationBankParam();
-                    applicationBankParam.CreatedBy = 1;
-                    applicationBankParam.CreationDate = DateTime.Now;
-                    applicationBankParam.ParamKey = "MID";
-                    applicationBankParam.ParamValue = MID;
-                    applicationBankParam.Status = 0;
-                    applicationBankParam.ApplicationBankId = applicationBank.Id;
+                    var applicationBankParam = new ApplicationBankParam
+                    {
+                        CreatedBy = 1,
+                        CreationDate = DateTime.Now,
+                        ParamKey = "MID",
+                        ParamValue = MID,
+                        Status = 0,
+                        ApplicationBankId = applicationBank.Id
+                    };
                     await _applicationBankParamRepository.Add(applicationBankParam);
                     return Ok();
                 }
@@ -135,13 +137,15 @@ namespace Adin.BankPayment.Controllers
                         CreationDate = DateTime.Now
                     };
                     await _applicationBankRepository.Add(applicationBank);
-                    var applicationBankParam = new ApplicationBankParam();
-                    applicationBankParam.CreatedBy = 1;
-                    applicationBankParam.CreationDate = DateTime.Now;
-                    applicationBankParam.ParamKey = "ParsianPIN";
-                    applicationBankParam.ParamValue = Pin;
-                    applicationBankParam.Status = 0;
-                    applicationBankParam.ApplicationBankId = applicationBank.Id;
+                    var applicationBankParam = new ApplicationBankParam
+                    {
+                        CreatedBy = 1,
+                        CreationDate = DateTime.Now,
+                        ParamKey = "ParsianPIN",
+                        ParamValue = Pin,
+                        Status = 0,
+                        ApplicationBankId = applicationBank.Id
+                    };
                     await _applicationBankParamRepository.Add(applicationBankParam);
                     return Ok();
                 }
@@ -239,7 +243,7 @@ namespace Adin.BankPayment.Controllers
             }
         }
 
-         [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> SetEfardaParams(string publicKey, string serviceId, string userName, string password)
         {
             try
@@ -313,6 +317,91 @@ namespace Adin.BankPayment.Controllers
                 var passwordParam =
                     applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "password");
                 passwordParam.ParamValue = password;
+                await _applicationBankRepository.Update(applicationBank);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest();
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SetPasargadParams(string publicKey, string merchantCode, string terminalCode, string privateKey)
+        {
+            try
+            {
+                var application = await _applicationRepository.GetFirstBy(x => x.PublicKey == publicKey);
+                if (application == null) return Unauthorized();
+
+                var bank = await _bankRepository.GetFirstBy(x => x.Code == (byte)BankCodeEnum.Efarda);
+                var applicationBank =
+                    await _applicationBankRepository.GetFirstBy(x =>
+                        x.ApplicationId == application.Id && x.BankId == bank.Id);
+
+                if (applicationBank == null)
+                {
+                    applicationBank = new ApplicationBank
+                    {
+                        CreatedBy = 1,
+                        BankId = bank.Id,
+                        Status = 0,
+                        ApplicationId = application.Id,
+                        CreationDate = DateTime.Now
+                    };
+                    await _applicationBankRepository.Add(applicationBank);
+
+                    var terminalBankParam = new ApplicationBankParam
+                    {
+                        CreatedBy = 1,
+                        CreationDate = DateTime.Now,
+                        ParamKey = "merchantCode",
+                        ParamValue = merchantCode,
+                        Status = 0,
+                        ApplicationBankId = applicationBank.Id
+                    };
+                    await _applicationBankParamRepository.Add(terminalBankParam);
+
+                    var userNameBankParam = new ApplicationBankParam
+                    {
+                        CreatedBy = 1,
+                        CreationDate = DateTime.Now,
+                        ParamKey = "terminalCode",
+                        ParamValue = terminalCode,
+                        Status = 0,
+                        ApplicationBankId = applicationBank.Id
+                    };
+                    await _applicationBankParamRepository.Add(userNameBankParam);
+
+                    var passwordBankParam = new ApplicationBankParam
+                    {
+                        CreatedBy = 1,
+                        CreationDate = DateTime.Now,
+                        ParamKey = "privateKey",
+                        ParamValue = privateKey,
+                        Status = 0,
+                        ApplicationBankId = applicationBank.Id,
+                    };
+                    await _applicationBankParamRepository.Add(passwordBankParam);
+
+                    return Ok();
+                }
+
+                var serviceIdParam =
+                    applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "merchantCode");
+                serviceIdParam.ParamValue = merchantCode;
+                await _applicationBankRepository.Update(applicationBank);
+
+                var userNameParam =
+                    applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "terminalCode");
+                userNameParam.ParamValue = terminalCode;
+                await _applicationBankRepository.Update(applicationBank);
+
+                var passwordParam =
+                    applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "privateKey");
+                passwordParam.ParamValue = privateKey;
                 await _applicationBankRepository.Update(applicationBank);
 
                 return Ok();

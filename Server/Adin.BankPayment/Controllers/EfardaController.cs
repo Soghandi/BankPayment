@@ -12,11 +12,11 @@ namespace Adin.BankPayment.Controllers
 {
     public class EfardaController : Controller
     {
-        private readonly ILogger<SamanController> _logger;
+        private readonly ILogger<EfardaController> _logger;
         private readonly IRepository<Transaction> _transactionRepository;
         private string _errorMsg = "";
 
-        public EfardaController(ILogger<SamanController> logger,
+        public EfardaController(ILogger<EfardaController> logger,
             IRepository<Transaction> transactionRepository)
         {
             _logger = logger;

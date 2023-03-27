@@ -1,16 +1,17 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
-using Adin.BankPayment.Connector.Enum;
+﻿using Adin.BankPayment.Connector.Enum;
 using Adin.BankPayment.Domain.Model;
 using Adin.BankPayment.Efarda;
 using Adin.BankPayment.Extension;
 using Adin.BankPayment.Mellat;
 using Adin.BankPayment.Parsian;
+using Adin.BankPayment.Pasargad;
 using Adin.BankPayment.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Adin.BankPayment.Controllers
 {
@@ -176,12 +177,9 @@ namespace Adin.BankPayment.Controllers
                 case (byte)BankCodeEnum.Efarda:
                     _logger.LogDebug("Efarda");
 
-                    var EfardaServiceId =
-                       applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "serviceId");
-                    var EfardaUsername =
-                        applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "userName");
-                    var EfardaPassword =
-                        applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "password");
+                    var EfardaServiceId = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "serviceId");
+                    var EfardaUsername = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "userName");
+                    var EfardaPassword = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "password");
 
                     EfardaGateway efardaGateway = new EfardaGateway(_logger, EfardaUsername.ParamValue, EfardaPassword.ParamValue, EfardaServiceId.ParamValue);
                     var traceNumber = await efardaGateway.GetTraceId(transaction.UserTrackCode, transaction.Amount.ToString("###############0"), transaction.BankRedirectUrl, transaction.Mobile.HasValue ? transaction.Mobile.Value.ToString() : string.Empty);
@@ -193,6 +191,25 @@ namespace Adin.BankPayment.Controllers
                     ViewBag.traceNumber = traceNumber;
 
                     return View("Efarda", transaction);
+
+
+                case (byte)BankCodeEnum.Pasargad:
+                    _logger.LogDebug("Pasargad");
+
+                    var merchantCode = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "merchantCode");
+                    var terminalCode = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "terminalCode");
+                    var privateKey = applicationBank.ApplicationBankParams.FirstOrDefault(x => x.ParamKey == "privateKey");
+
+                    var pasargadGateway = new PasargadGateway(_logger, merchantCode.ParamValue, terminalCode.ParamValue, privateKey.ParamValue);
+
+                    var Token = await pasargadGateway.GetToken(transaction.UserTrackCode, (int)transaction.Amount, transaction.BankRedirectUrl,
+                        transaction.Mobile.HasValue ? transaction.Mobile.Value.ToString() : string.Empty, applicationBank.Application.Title, transaction.CreationDate);
+
+                    transaction.BankTrackCode = Token;
+                    await _transactionRepository.Update(transaction);
+
+                    return View("Pasargad", transaction);
+
 
                 case (byte)BankCodeEnum.Saman:
                 default:
